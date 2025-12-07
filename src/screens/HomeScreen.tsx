@@ -3,9 +3,17 @@
  * Implements GH-001: Select game mode
  */
 
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GameModeCard } from "../components/game/GameModeCard";
 import { RivalryCard } from "../components/game/RivalryCard";
@@ -24,6 +32,7 @@ export function HomeScreen() {
   const dispatch = useAppDispatch();
 
   const rivalries = useAppSelector((state) => state.rivalry.rivalries);
+  const hapticEnabled = useAppSelector((state) => state.settings.hapticEnabled);
 
   // Sort rivalries by most recently played
   const sortedRivalries = useMemo(() => {
@@ -45,6 +54,13 @@ export function HomeScreen() {
     router.push("/game/setup");
   };
 
+  const handleSettingsPress = () => {
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    router.push("/settings");
+  };
+
   const styles = createStyles(theme.colors, insets);
 
   return (
@@ -56,8 +72,23 @@ export function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>CueFlow</Text>
-          <Text style={styles.subtitle}>Choose your game</Text>
+          <View style={styles.headerTop}>
+            <View style={styles.headerTitleContainer}>
+              <Text style={styles.title}>CueFlow</Text>
+              <Text style={styles.subtitle}>Choose your game</Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleSettingsPress}
+              style={styles.settingsButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Game Mode Selection - GH-001 */}
@@ -110,6 +141,22 @@ const createStyles = (
     },
     header: {
       marginBottom: 32,
+    },
+    headerTop: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+    },
+    headerTitleContainer: {
+      flex: 1,
+    },
+    settingsButton: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 20,
+      backgroundColor: colors.surface,
     },
     title: {
       fontSize: 36,

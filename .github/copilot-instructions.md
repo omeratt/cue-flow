@@ -42,7 +42,7 @@ Follow the phased approach defined in the PRD (Section 9.3):
 | Phase   | Focus                                                             | Status         |
 | ------- | ----------------------------------------------------------------- | -------------- |
 | Phase 1 | Core timer (home screen, player setup, timer, duration selection) | ✅ Completed   |
-| Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | 🟡 In Progress |
+| Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | ✅ Completed   |
 | Phase 3 | Scoring (win tracking, snooker points, fouls)                     | 🔴 Not Started |
 | Phase 4 | Rivalry system (persistence, history, continue/delete)            | 🔴 Not Started |
 | Phase 5 | Polish & testing                                                  | 🔴 Not Started |
@@ -60,14 +60,14 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-004**: Start and stop timer ✅ COMPLETED
 - **GH-005**: View animated countdown ✅ COMPLETED
 - **GH-006**: Hear audio alerts ✅ COMPLETED
-- **GH-007**: Feel haptic feedback (partial - basic haptic on tap/switch)
+- **GH-007**: Feel haptic feedback ✅ COMPLETED
 - **GH-008**: Mark game winner
 - **GH-009**: Score snooker points
 - **GH-010**: Handle snooker fouls
 - **GH-011**: View rivalry history ✅ COMPLETED (basic UI)
 - **GH-012**: Continue existing rivalry ✅ COMPLETED
 - **GH-013**: Delete rivalry
-- **GH-014**: Toggle theme
+- **GH-014**: Toggle theme ✅ COMPLETED
 - **GH-015**: Pause and resume game ✅ COMPLETED
 - **GH-016**: Mute sounds ✅ COMPLETED
 - **GH-017**: Start new rivalry ✅ COMPLETED
@@ -209,8 +209,8 @@ Check these locations for reusable components before creating new ones:
 
 **Last Updated**: December 7, 2025
 
-**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-011 (basic), GH-012, GH-015, GH-016, GH-017
+**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-007, GH-011 (basic), GH-012, GH-014, GH-015, GH-016, GH-017
 
-**In Progress**: Phase 2 - Audio & polish (nearly complete)
+**Completed Phases**: Phase 1 (Core timer), Phase 2 (Audio & polish)
 
-**Next Up**: GH-007 (Feel haptic feedback - enhancement), GH-014 (Toggle theme)
+**Next Up**: Phase 3 - Scoring (GH-008, GH-009, GH-010)
