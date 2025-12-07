@@ -94,7 +94,7 @@ export function useGameTimer({
 
     // Check for second ticks (for audio/haptic feedback)
     const currentSecond = Math.ceil(remainingTime.value / 1000);
-    if (currentSecond !== lastTickSecond.value && currentSecond > 0) {
+    if (currentSecond !== lastTickSecond.value && currentSecond >= 0) {
       lastTickSecond.value = currentSecond;
       if (onTick) {
         scheduleOnRN(onTick, currentSecond);

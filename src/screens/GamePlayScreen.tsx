@@ -46,9 +46,11 @@ export function GamePlayScreen() {
     remainingTime,
     progress,
     timerState,
+    soundEnabled,
     handleTimerPress,
     handleBack,
     handlePauseResume,
+    handleToggleSound,
     router,
   } = useGamePlay();
 
@@ -59,7 +61,9 @@ export function GamePlayScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {/* Header */}
       <GameHeader
         modeConfig={modeConfig}
@@ -67,6 +71,8 @@ export function GamePlayScreen() {
         textColor={theme.colors.text}
         onBack={handleBack}
         onPauseResume={handlePauseResume}
+        soundEnabled={soundEnabled}
+        onToggleSound={handleToggleSound}
       />
 
       {/* Player indicator */}

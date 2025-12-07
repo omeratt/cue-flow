@@ -1,6 +1,8 @@
 /**
- * GameHeader - Game screen header with back button, mode info, and pause button
+ * GameHeader - Game screen header with back button, mode info, mute, and pause buttons
  * Extracted from GamePlayScreen for better component organization
+ *
+ * Implements partial GH-016: Mute sounds (quick mute button)
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +25,8 @@ interface GameHeaderProps {
   readonly textColor: string;
   readonly onBack: () => void;
   readonly onPauseResume: () => void;
+  readonly soundEnabled?: boolean;
+  readonly onToggleSound?: () => void;
 }
 
 export function GameHeader({
@@ -31,6 +35,8 @@ export function GameHeader({
   textColor,
   onBack,
   onPauseResume,
+  soundEnabled = true,
+  onToggleSound,
 }: Readonly<GameHeaderProps>) {
   const insets = useSafeAreaInsets();
 
@@ -51,9 +57,20 @@ export function GameHeader({
         )}
       </View>
 
-      <TouchableOpacity onPress={onPauseResume} style={styles.iconButton}>
-        <PauseResumeIcon timerState={timerState} color={textColor} />
-      </TouchableOpacity>
+      <View style={styles.headerRight}>
+        {onToggleSound && (
+          <TouchableOpacity onPress={onToggleSound} style={styles.iconButton}>
+            <Ionicons
+              name={soundEnabled ? "volume-high" : "volume-mute"}
+              size={24}
+              color={textColor}
+            />
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={onPauseResume} style={styles.iconButton}>
+          <PauseResumeIcon timerState={timerState} color={textColor} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -76,6 +93,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   modeIcon: {
     fontSize: 24,

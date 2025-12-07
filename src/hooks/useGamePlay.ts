@@ -2,6 +2,9 @@
  * useGamePlay - Hook for managing game play logic
  * Combines game state from Redux, timer control, and callbacks
  * Extracted from GamePlayScreen for better separation of concerns
+ *
+ * Implements:
+ * - GH-006: Hear audio alerts (via useTimerAudio)
  */
 
 import * as Haptics from "expo-haptics";
@@ -12,6 +15,7 @@ import { GAME_MODES } from "../lib/constants/game";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { pauseGame, resumeGame, switchPlayer } from "../store/slices/gameSlice";
 import { useGameTimer } from "./useGameTimer";
+import { useTimerAudio } from "./useTimerAudio";
 
 export function useGamePlay() {
   const router = useRouter();
@@ -23,6 +27,7 @@ export function useGamePlay() {
   const player2Name = useAppSelector((state) => state.game.player2Name);
   const timerDuration = useAppSelector((state) => state.game.timerDuration);
   const currentPlayer = useAppSelector((state) => state.game.currentPlayer);
+  const hapticEnabled = useAppSelector((state) => state.settings.hapticEnabled);
 
   // Local state for current player name (synced from Redux)
   const [displayCurrentPlayer, setDisplayCurrentPlayer] =
@@ -30,24 +35,42 @@ export function useGamePlay() {
 
   const modeConfig = gameMode ? GAME_MODES[gameMode] : null;
 
+  // Initialize audio hook for timer alerts (GH-006)
+  const timerAudio = useTimerAudio({ duration: timerDuration });
+
   // Timer callbacks
   const handleExpire = useCallback(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-  }, []);
+    if (hapticEnabled) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    // Play final beep on timer expire
+    timerAudio.playFinalBeep();
+  }, [hapticEnabled, timerAudio]);
 
   const handlePlayerSwitch = useCallback(() => {
     dispatch(switchPlayer());
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, [dispatch]);
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  }, [dispatch, hapticEnabled]);
 
   const handleTick = useCallback(
     (remainingSeconds: number) => {
       const threshold = Math.ceil(timerDuration / 3);
-      if (remainingSeconds <= threshold && remainingSeconds > 0) {
+
+      // Haptic feedback in final third
+      if (
+        hapticEnabled &&
+        remainingSeconds <= threshold &&
+        remainingSeconds > 0
+      ) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
+
+      // Audio beep in final third (GH-006)
+      timerAudio.handleTick(remainingSeconds);
     },
-    [timerDuration]
+    [timerDuration, hapticEnabled, timerAudio]
   );
 
   // Initialize timer hook
@@ -71,8 +94,10 @@ export function useGamePlay() {
   // Handle timer tap
   const handleTimerPress = useCallback(() => {
     timer.handleTap();
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, [timer]);
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  }, [timer, hapticEnabled]);
 
   // Handle back button
   const handleBack = useCallback(() => {
@@ -90,8 +115,21 @@ export function useGamePlay() {
       timer.resume();
       dispatch(resumeGame());
     }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, [timer, dispatch]);
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  }, [timer, dispatch, hapticEnabled]);
+
+  // Get sound enabled state from Redux
+  const soundEnabled = useAppSelector((state) => state.settings.soundEnabled);
+
+  // Handle toggle sound (GH-016)
+  const handleToggleSound = useCallback(() => {
+    dispatch({ type: "settings/toggleSound" });
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  }, [dispatch, hapticEnabled]);
 
   return {
     // Game state
@@ -106,10 +144,14 @@ export function useGamePlay() {
     progress: timer.progress,
     timerState: timer.timerState,
 
+    // Sound state
+    soundEnabled,
+
     // Actions
     handleTimerPress,
     handleBack,
     handlePauseResume,
+    handleToggleSound,
     reset: timer.reset,
 
     // Navigation
