@@ -1,33 +1,12 @@
 /**
- * Game Play Screen route (placeholder for now)
- * GH-004: Start and stop timer
- * GH-005: View animated countdown
+ * Game Play Screen route
+ * Implements:
+ * - GH-004: Start and stop timer
+ * - GH-005: View animated countdown
  */
 
-import { StyleSheet, Text, View } from "react-native";
-import { useTheme } from "../../src/components/providers/ThemeProvider";
+import { GamePlayScreen } from "../../src/screens/GamePlayScreen";
 
 export default function GamePlay() {
-  const { theme } = useTheme();
-
-  return (
-    <View
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
-      <Text style={[styles.text, { color: theme.colors.text }]}>
-        Game Screen - Coming in Phase 1 (continued)
-      </Text>
-    </View>
-  );
+  return <GamePlayScreen />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 18,
-  },
-});

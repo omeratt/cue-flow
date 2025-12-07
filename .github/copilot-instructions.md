@@ -41,8 +41,8 @@ Follow the phased approach defined in the PRD (Section 9.3):
 
 | Phase   | Focus                                                             | Status         |
 | ------- | ----------------------------------------------------------------- | -------------- |
-| Phase 1 | Core timer (home screen, player setup, timer, duration selection) | 🟡 In Progress |
-| Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | 🔴 Not Started |
+| Phase 1 | Core timer (home screen, player setup, timer, duration selection) | ✅ Completed   |
+| Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | 🟡 In Progress |
 | Phase 3 | Scoring (win tracking, snooker points, fouls)                     | 🔴 Not Started |
 | Phase 4 | Rivalry system (persistence, history, continue/delete)            | 🔴 Not Started |
 | Phase 5 | Polish & testing                                                  | 🔴 Not Started |
@@ -57,7 +57,10 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-004**: Start and stop timer
 - **GH-005**: View animated countdown
 - **GH-006**: Hear audio alerts
-- **GH-007**: Feel haptic feedback
+- **GH-004**: Start and stop timer ✅ COMPLETED
+- **GH-005**: View animated countdown ✅ COMPLETED
+- **GH-006**: Hear audio alerts
+- **GH-007**: Feel haptic feedback (partial - basic haptic on tap/switch)
 - **GH-008**: Mark game winner
 - **GH-009**: Score snooker points
 - **GH-010**: Handle snooker fouls
@@ -65,7 +68,7 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-012**: Continue existing rivalry ✅ COMPLETED
 - **GH-013**: Delete rivalry
 - **GH-014**: Toggle theme
-- **GH-015**: Pause and resume game
+- **GH-015**: Pause and resume game ✅ COMPLETED
 - **GH-016**: Mute sounds
 - **GH-017**: Start new rivalry ✅ COMPLETED
 
@@ -101,12 +104,113 @@ After completing a user story:
 - Routes in `app/` should be thin - put logic in `src/`
 - **TypeScript: Full type coverage required** - NO `any` type allowed. Use proper types, generics, or `unknown` with type guards
 
+---
+
+## 🏗️ Component Architecture Guidelines
+
+**CRITICAL**: Follow these guidelines from the START of development, not as a refactor later.
+
+### Screen Size Limit
+
+- **Screens should be under 150 lines of code**
+- If a screen is getting long, it's a sign you need to extract components/hooks
+
+### Component Extraction Rules
+
+When building a new screen, immediately identify and extract:
+
+| Component Type         | When to Extract                                          | Location                             |
+| ---------------------- | -------------------------------------------------------- | ------------------------------------ |
+| **UI Elements**        | Any reusable visual element (buttons, cards, indicators) | `src/components/ui/`                 |
+| **Feature Components** | Feature-specific components (game timer, player cards)   | `src/components/{feature}/`          |
+| **Layout Components**  | Headers, footers, sections                               | `src/components/{feature}/` or `ui/` |
+
+### Hook Extraction Rules
+
+| Hook Type           | When to Extract                                        | Location                             |
+| ------------------- | ------------------------------------------------------ | ------------------------------------ |
+| **Feature Logic**   | Complex state + callbacks + side effects for a feature | `src/hooks/use{Feature}.ts`          |
+| **Shared Logic**    | Logic used across multiple screens                     | `src/hooks/`                         |
+| **Animation Logic** | Reanimated SharedValues + animations                   | `src/hooks/use{Feature}Animation.ts` |
+
+### Naming Conventions
+
+```
+Components:  PascalCase     → PlayerIndicator.tsx, GameHeader.tsx
+Hooks:       camelCase      → useGamePlay.ts, useGameTimer.ts
+Utilities:   camelCase      → formatTime.ts, storage.ts
+Constants:   SCREAMING_CASE → GAME_MODES, TIMER_DURATIONS
+```
+
+### File Structure Pattern
+
+For a new screen like `GamePlayScreen`, create:
+
+```
+src/
+├── screens/
+│   └── GamePlayScreen.tsx          # < 150 lines, composes components
+├── hooks/
+│   └── useGamePlay.ts              # Screen logic hook
+├── components/
+│   └── game/
+│       ├── GameHeader.tsx          # Header component
+│       ├── PlayerIndicator.tsx     # Player display
+│       ├── ScoreDisplay.tsx        # Score component
+│       └── TimerInstructions.tsx   # Instructions text
+```
+
+### Component Design Principles
+
+1. **Single Responsibility**: Each component does ONE thing well
+2. **Props Over State**: Prefer receiving data via props over internal state
+3. **Composition**: Build complex UIs by composing simple components
+4. **Colocation**: Keep related components in the same folder
+
+### Screen Composition Template
+
+A well-structured screen should look like this:
+
+```tsx
+export function ExampleScreen() {
+  const { theme } = useTheme();
+  const { data, actions } = useFeatureHook();
+
+  if (!data) {
+    return <LoadingState />;
+  }
+
+  return (
+    <View style={styles.container}>
+      <FeatureHeader {...headerProps} />
+      <FeatureContent {...contentProps} />
+      <FeatureFooter {...footerProps} />
+    </View>
+  );
+}
+```
+
+### Before Creating a New Screen, Ask:
+
+1. ✅ What components can I extract immediately?
+2. ✅ What logic belongs in a custom hook?
+3. ✅ Are there existing components I can reuse?
+4. ✅ Will the screen be under 150 lines?
+
+### Existing Component Library
+
+Check these locations for reusable components before creating new ones:
+
+- `src/components/ui/` - Generic UI components
+- `src/components/game/` - Game-specific components
+- `src/hooks/` - Reusable hooks
+
 ## Current Session Status
 
-**Last Updated**: December 6, 2025
+**Last Updated**: December 7, 2025
 
-**Completed Stories**: GH-001, GH-002, GH-003, GH-011 (basic), GH-012, GH-017
+**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-011 (basic), GH-012, GH-015, GH-017
 
-**In Progress**: Phase 1 - Timer implementation
+**In Progress**: Phase 2 - Audio & polish
 
-**Next Up**: GH-004 (Start and stop timer), GH-005 (View animated countdown)
+**Next Up**: GH-006 (Hear audio alerts), GH-007 (Feel haptic feedback - enhancement)
