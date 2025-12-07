@@ -1,15 +1,10 @@
-import { Text, View } from "react-native";
+/**
+ * Home route - displays the HomeScreen
+ * GH-001: Select game mode
+ */
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
-  );
+import { HomeScreen } from "../src/screens/HomeScreen";
+
+export default function Home() {
+  return <HomeScreen />;
 }

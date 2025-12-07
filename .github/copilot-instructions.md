@@ -41,7 +41,7 @@ Follow the phased approach defined in the PRD (Section 9.3):
 
 | Phase   | Focus                                                             | Status         |
 | ------- | ----------------------------------------------------------------- | -------------- |
-| Phase 1 | Core timer (home screen, player setup, timer, duration selection) | 🔴 Not Started |
+| Phase 1 | Core timer (home screen, player setup, timer, duration selection) | 🟡 In Progress |
 | Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | 🔴 Not Started |
 | Phase 3 | Scoring (win tracking, snooker points, fouls)                     | 🔴 Not Started |
 | Phase 4 | Rivalry system (persistence, history, continue/delete)            | 🔴 Not Started |
@@ -51,9 +51,9 @@ Follow the phased approach defined in the PRD (Section 9.3):
 
 When implementing a feature, always reference the corresponding user story ID:
 
-- **GH-001**: Select game mode
-- **GH-002**: Enter player names
-- **GH-003**: Select timer duration
+- **GH-001**: Select game mode ✅ COMPLETED
+- **GH-002**: Enter player names ✅ COMPLETED
+- **GH-003**: Select timer duration ✅ COMPLETED
 - **GH-004**: Start and stop timer
 - **GH-005**: View animated countdown
 - **GH-006**: Hear audio alerts
@@ -61,13 +61,13 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-008**: Mark game winner
 - **GH-009**: Score snooker points
 - **GH-010**: Handle snooker fouls
-- **GH-011**: View rivalry history
-- **GH-012**: Continue existing rivalry
+- **GH-011**: View rivalry history ✅ COMPLETED (basic UI)
+- **GH-012**: Continue existing rivalry ✅ COMPLETED
 - **GH-013**: Delete rivalry
 - **GH-014**: Toggle theme
 - **GH-015**: Pause and resume game
 - **GH-016**: Mute sounds
-- **GH-017**: Start new rivalry
+- **GH-017**: Start new rivalry ✅ COMPLETED
 
 ### 4. Completion Checklist
 
@@ -103,10 +103,10 @@ After completing a user story:
 
 ## Current Session Status
 
-**Last Updated**: Not started yet
+**Last Updated**: December 6, 2025
 
-**Completed Stories**: None
+**Completed Stories**: GH-001, GH-002, GH-003, GH-011 (basic), GH-012, GH-017
 
-**In Progress**: None
+**In Progress**: Phase 1 - Timer implementation
 
-**Next Up**: Phase 1 - GH-001 (Select game mode)
+**Next Up**: GH-004 (Start and stop timer), GH-005 (View animated countdown)
