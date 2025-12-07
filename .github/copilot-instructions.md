@@ -59,7 +59,7 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-006**: Hear audio alerts
 - **GH-004**: Start and stop timer ✅ COMPLETED
 - **GH-005**: View animated countdown ✅ COMPLETED
-- **GH-006**: Hear audio alerts
+- **GH-006**: Hear audio alerts ✅ COMPLETED
 - **GH-007**: Feel haptic feedback (partial - basic haptic on tap/switch)
 - **GH-008**: Mark game winner
 - **GH-009**: Score snooker points
@@ -69,7 +69,7 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-013**: Delete rivalry
 - **GH-014**: Toggle theme
 - **GH-015**: Pause and resume game ✅ COMPLETED
-- **GH-016**: Mute sounds
+- **GH-016**: Mute sounds ✅ COMPLETED
 - **GH-017**: Start new rivalry ✅ COMPLETED
 
 ### 4. Completion Checklist
@@ -209,8 +209,8 @@ Check these locations for reusable components before creating new ones:
 
 **Last Updated**: December 7, 2025
 
-**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-011 (basic), GH-012, GH-015, GH-017
+**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-011 (basic), GH-012, GH-015, GH-016, GH-017
 
-**In Progress**: Phase 2 - Audio & polish
+**In Progress**: Phase 2 - Audio & polish (nearly complete)
 
-**Next Up**: GH-006 (Hear audio alerts), GH-007 (Feel haptic feedback - enhancement)
+**Next Up**: GH-007 (Feel haptic feedback - enhancement), GH-014 (Toggle theme)
