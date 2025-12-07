@@ -17,6 +17,9 @@ import { pauseGame, resumeGame, switchPlayer } from "../store/slices/gameSlice";
 import { useGameTimer } from "./useGameTimer";
 import { useTimerAudio } from "./useTimerAudio";
 
+// Constants for feedback timing (aligned with audio)
+const HAPTIC_THRESHOLD_SECONDS = 5; // Haptics play in last 5 seconds
+
 export function useGamePlay() {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -56,21 +59,19 @@ export function useGamePlay() {
 
   const handleTick = useCallback(
     (remainingSeconds: number) => {
-      const threshold = Math.ceil(timerDuration / 3);
-
-      // Haptic feedback in final third
+      // Haptic feedback in last 5 seconds
       if (
         hapticEnabled &&
-        remainingSeconds <= threshold &&
+        remainingSeconds <= HAPTIC_THRESHOLD_SECONDS &&
         remainingSeconds > 0
       ) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
 
-      // Audio beep in final third (GH-006)
+      // Audio beep in last 5 seconds + ticking in last 10 seconds (GH-006)
       timerAudio.handleTick(remainingSeconds);
     },
-    [timerDuration, hapticEnabled, timerAudio]
+    [hapticEnabled, timerAudio]
   );
 
   // Initialize timer hook
@@ -91,45 +92,56 @@ export function useGamePlay() {
     return displayCurrentPlayer === "player1" ? player1Name : player2Name;
   };
 
-  // Handle timer tap
+  // Handle timer tap - stop ticking when timer is stopped
   const handleTimerPress = useCallback(() => {
+    // If timer is running and will be stopped, stop ticking first
+    if (timer.timerState.value === "running") {
+      timerAudio.stopTicking();
+    }
     timer.handleTap();
     if (hapticEnabled) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-  }, [timer, hapticEnabled]);
+  }, [timer, hapticEnabled, timerAudio]);
 
-  // Handle back button
+  // Handle back button - stop ticking before navigating away
   const handleBack = useCallback(() => {
+    timerAudio.stopTicking();
     timer.reset();
     router.back();
-  }, [timer, router]);
+  }, [timer, router, timerAudio]);
 
-  // Handle pause/resume
+  // Handle pause/resume - stop/resume ticking accordingly
   const handlePauseResume = useCallback(() => {
     const currentState = timer.timerState.value;
     if (currentState === "running") {
+      timerAudio.stopTicking();
       timer.pause();
       dispatch(pauseGame());
     } else if (currentState === "paused") {
       timer.resume();
       dispatch(resumeGame());
+      // Note: ticking will resume automatically via handleTick when timer runs
     }
     if (hapticEnabled) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-  }, [timer, dispatch, hapticEnabled]);
+  }, [timer, dispatch, hapticEnabled, timerAudio]);
 
   // Get sound enabled state from Redux
   const soundEnabled = useAppSelector((state) => state.settings.soundEnabled);
 
-  // Handle toggle sound (GH-016)
+  // Handle toggle sound (GH-016) - stop ticking if sound is being disabled
   const handleToggleSound = useCallback(() => {
+    // If sound is currently enabled and will be disabled, stop ticking
+    if (soundEnabled) {
+      timerAudio.stopTicking();
+    }
     dispatch({ type: "settings/toggleSound" });
     if (hapticEnabled) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-  }, [dispatch, hapticEnabled]);
+  }, [dispatch, hapticEnabled, soundEnabled, timerAudio]);
 
   return {
     // Game state

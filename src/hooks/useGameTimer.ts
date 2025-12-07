@@ -183,14 +183,35 @@ export function useGameTimer({
 
   const handleTap = useCallback(() => {
     const currentState = timerState.value;
-    if (currentState === "idle" || currentState === "expired") {
+    if (currentState === "idle") {
       start();
+    } else if (currentState === "expired") {
+      // When expired, just reset and switch player without auto-starting
+      timerState.value = "idle";
+      frameCallback.setActive(false);
+      remainingTime.value = totalDuration.value;
+      progress.value = 1;
+      lastTickSecond.value = -1;
+      if (onPlayerSwitch) {
+        scheduleOnRN(onPlayerSwitch);
+      }
     } else if (currentState === "running") {
       stop();
     } else if (currentState === "paused") {
       resume();
     }
-  }, [timerState, start, stop, resume]);
+  }, [
+    timerState,
+    start,
+    stop,
+    resume,
+    frameCallback,
+    remainingTime,
+    totalDuration,
+    progress,
+    lastTickSecond,
+    onPlayerSwitch,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {

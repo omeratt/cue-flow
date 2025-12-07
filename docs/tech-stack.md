@@ -27,13 +27,14 @@ This document defines the approved technologies for each feature in CueFlow. **D
 
 ## 🎨 UI & Styling
 
-| Feature              | Technology                     | Notes                   |
-| -------------------- | ------------------------------ | ----------------------- |
-| Component styling    | React Native StyleSheet        | Native styling API      |
-| Theming (Dark/Light) | React Native Appearance API    | System theme detection  |
-| Theme context        | React Context                  | Custom ThemeProvider    |
-| Icons                | @expo/vector-icons             | Ionicons, MaterialIcons |
-| Safe areas           | react-native-safe-area-context | Already installed       |
+| Feature              | Technology                     | Notes                       |
+| -------------------- | ------------------------------ | --------------------------- |
+| Component styling    | React Native StyleSheet        | Native styling API          |
+| Theming (Dark/Light) | React Native Appearance API    | System theme detection      |
+| Theme context        | React Context                  | Custom ThemeProvider        |
+| Icons                | @expo/vector-icons             | Ionicons, MaterialIcons     |
+| Safe areas           | react-native-safe-area-context | Already installed           |
+| Gradients            | expo-linear-gradient           | Premium 3D effects on balls |
 
 ---
 

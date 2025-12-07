@@ -12,14 +12,17 @@ import type { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { TimerState } from "../../hooks/useGameTimer";
+import type { GameMode } from "../../lib/constants/game";
+import { typography } from "../../lib/theme";
+import { GameModeIcon } from "./GameModeIcon";
 import { PauseResumeIcon } from "./PauseResumeIcon";
 
 interface GameModeConfig {
-  icon: string;
   label: string;
 }
 
 interface GameHeaderProps {
+  readonly gameMode: GameMode | null;
   readonly modeConfig: GameModeConfig | null;
   readonly timerState: ReturnType<typeof useSharedValue<TimerState>>;
   readonly textColor: string;
@@ -30,6 +33,7 @@ interface GameHeaderProps {
 }
 
 export function GameHeader({
+  gameMode,
   modeConfig,
   timerState,
   textColor,
@@ -47,9 +51,9 @@ export function GameHeader({
       </TouchableOpacity>
 
       <View style={styles.headerCenter}>
-        {modeConfig && (
+        {gameMode && modeConfig && (
           <>
-            <Text style={styles.modeIcon}>{modeConfig.icon}</Text>
+            <GameModeIcon mode={gameMode} size="md" />
             <Text style={[styles.modeLabel, { color: textColor }]}>
               {modeConfig.label}
             </Text>
@@ -98,11 +102,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  modeIcon: {
-    fontSize: 24,
-  },
   modeLabel: {
     fontSize: 18,
     fontWeight: "600",
+    fontFamily: typography.fonts.semiBold,
   },
 });

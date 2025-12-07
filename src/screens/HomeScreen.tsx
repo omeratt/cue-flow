@@ -20,6 +20,7 @@ import { RivalryCard } from "../components/game/RivalryCard";
 import { useTheme } from "../components/providers/ThemeProvider";
 import { EmptyState } from "../components/ui/EmptyState";
 import type { GameMode } from "../lib/constants/game";
+import { typography } from "../lib/theme";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setGameMode } from "../store/slices/gameSlice";
 import { setActiveRivalry } from "../store/slices/rivalrySlice";
@@ -161,11 +162,13 @@ const createStyles = (
     title: {
       fontSize: 36,
       fontWeight: "700",
+      fontFamily: typography.fonts.bold,
       color: colors.text,
       marginBottom: 4,
     },
     subtitle: {
       fontSize: 18,
+      fontFamily: typography.fonts.regular,
       color: colors.textSecondary,
     },
     section: {
@@ -174,6 +177,7 @@ const createStyles = (
     sectionTitle: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.textMuted,
       textTransform: "uppercase",
       letterSpacing: 1,

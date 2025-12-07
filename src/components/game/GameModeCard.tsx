@@ -19,7 +19,9 @@ import Animated, {
 } from "react-native-reanimated";
 import type { GameMode } from "../../lib/constants/game";
 import { GAME_MODES } from "../../lib/constants/game";
+import { typography } from "../../lib/theme";
 import { useTheme } from "../providers/ThemeProvider";
+import { GameModeIcon } from "./GameModeIcon";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -81,7 +83,7 @@ export function GameModeCard({ mode, onPress, style }: GameModeCardProps) {
       style={[styles.card, animatedStyle, style]}
     >
       <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{modeConfig.icon}</Text>
+        <GameModeIcon mode={mode} size="lg" />
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>{modeConfig.label}</Text>
@@ -112,13 +114,9 @@ const createStyles = (
       width: 56,
       height: 56,
       borderRadius: 12,
-      backgroundColor: `${modeColor}15`,
       justifyContent: "center",
       alignItems: "center",
       marginRight: 16,
-    },
-    icon: {
-      fontSize: 28,
     },
     content: {
       flex: 1,
@@ -126,11 +124,13 @@ const createStyles = (
     title: {
       fontSize: 20,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.text,
       marginBottom: 4,
     },
     description: {
       fontSize: 14,
+      fontFamily: typography.fonts.regular,
       color: colors.textSecondary,
     },
     indicator: {

@@ -92,6 +92,38 @@ const scoreSlice = createSlice({
       state.currentFrameScore = { player1: 0, player2: 0 };
     },
 
+    // Subtract points (for undo)
+    subtractBallPoints: (
+      state,
+      action: PayloadAction<{
+        player: "player1" | "player2";
+        ball: SnookerBallType;
+      }>
+    ) => {
+      const { player, ball } = action.payload;
+      const points = SNOOKER_BALLS[ball].value;
+      state.currentFrameScore[player] = Math.max(
+        0,
+        state.currentFrameScore[player] - points
+      );
+    },
+
+    // Subtract foul points (for undo)
+    subtractFoulPoints: (
+      state,
+      action: PayloadAction<{
+        foulingPlayer: "player1" | "player2";
+        points: FoulValue;
+      }>
+    ) => {
+      const { foulingPlayer, points } = action.payload;
+      const opponent = foulingPlayer === "player1" ? "player2" : "player1";
+      state.currentFrameScore[opponent] = Math.max(
+        0,
+        state.currentFrameScore[opponent] - points
+      );
+    },
+
     // Reset all scores (for new session)
     resetAllScores: () => initialState,
   },
@@ -103,6 +135,8 @@ export const {
   addFoulPoints,
   recordFrameWin,
   resetFrameScore,
+  subtractBallPoints,
+  subtractFoulPoints,
   resetAllScores,
 } = scoreSlice.actions;
 

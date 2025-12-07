@@ -4,12 +4,14 @@
  */
 
 import React, { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+
+import { typography } from "../../lib/theme";
 
 interface PlayerIndicatorProps {
   readonly currentPlayerName: string;
@@ -40,7 +42,6 @@ export function PlayerIndicator({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: labelColor }]}>Current Turn</Text>
       <Animated.Text
         style={[styles.playerName, { color: nameColor }, playerNameStyle]}
       >
@@ -57,10 +58,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily: typography.fonts.regular,
     marginBottom: 4,
   },
   playerName: {
     fontSize: 28,
     fontWeight: "700",
+    fontFamily: typography.fonts.bold,
   },
 });

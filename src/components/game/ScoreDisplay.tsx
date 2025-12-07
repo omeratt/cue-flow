@@ -6,6 +6,7 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { typography } from "../../lib/theme";
 
 interface ScoreDisplayColors {
   surface: string;
@@ -83,16 +84,19 @@ const styles = StyleSheet.create({
   playerName: {
     fontSize: 14,
     fontWeight: "500",
+    fontFamily: typography.fonts.medium,
     marginBottom: 4,
   },
   score: {
     fontSize: 32,
     fontWeight: "700",
+    fontFamily: typography.fonts.bold,
   },
   divider: {
     paddingHorizontal: 16,
   },
   vs: {
     fontSize: 20,
+    fontFamily: typography.fonts.regular,
   },
 });

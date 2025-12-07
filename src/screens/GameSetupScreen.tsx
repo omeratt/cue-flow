@@ -24,12 +24,14 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { GameModeIcon } from "../components/game/GameModeIcon";
 import { useTheme } from "../components/providers/ThemeProvider";
 import {
   DEFAULT_TIMER_DURATION,
   GAME_MODES,
   TIMER_PRESETS,
 } from "../lib/constants/game";
+import { typography } from "../lib/theme";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setPlayers, setTimerDuration } from "../store/slices/gameSlice";
 import { createOrFindRivalry } from "../store/slices/rivalrySlice";
@@ -145,7 +147,7 @@ export function GameSetupScreen() {
             <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
-            <Text style={styles.modeIcon}>{modeConfig?.icon}</Text>
+            {gameMode && <GameModeIcon mode={gameMode} size="md" />}
             <Text style={styles.title}>{modeConfig?.label} Setup</Text>
           </View>
         </View>
@@ -291,6 +293,7 @@ function DurationButton({
         style={{
           fontSize: 18,
           fontWeight: "600",
+          fontFamily: typography.fonts.semiBold,
           color: isSelected ? colors.primary : colors.text,
         }}
       >
@@ -334,14 +337,12 @@ const createStyles = (
     headerContent: {
       flexDirection: "row",
       alignItems: "center",
-    },
-    modeIcon: {
-      fontSize: 28,
-      marginRight: 12,
+      gap: 12,
     },
     title: {
       fontSize: 28,
       fontWeight: "700",
+      fontFamily: typography.fonts.bold,
       color: colors.text,
     },
     rivalryBadge: {
@@ -358,6 +359,7 @@ const createStyles = (
       color: colors.primary,
       marginLeft: 8,
       fontWeight: "500",
+      fontFamily: typography.fonts.medium,
     },
     section: {
       marginBottom: 32,
@@ -365,6 +367,7 @@ const createStyles = (
     sectionTitle: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.textMuted,
       textTransform: "uppercase",
       letterSpacing: 1,
@@ -376,6 +379,7 @@ const createStyles = (
     inputLabel: {
       fontSize: 14,
       fontWeight: "500",
+      fontFamily: typography.fonts.medium,
       color: colors.textSecondary,
       marginBottom: 8,
     },
@@ -387,6 +391,7 @@ const createStyles = (
       paddingHorizontal: 16,
       paddingVertical: 14,
       fontSize: 16,
+      fontFamily: typography.fonts.regular,
       color: colors.text,
     },
     inputActive: {
@@ -427,6 +432,7 @@ const createStyles = (
     startButtonText: {
       fontSize: 18,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.buttonText,
       marginRight: 8,
     },

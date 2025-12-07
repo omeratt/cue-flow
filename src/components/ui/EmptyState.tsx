@@ -4,6 +4,7 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { typography } from "../../lib/theme";
 import { useTheme } from "../providers/ThemeProvider";
 
 interface EmptyStateProps {
@@ -41,12 +42,14 @@ const createStyles = (colors: ReturnType<typeof useTheme>["theme"]["colors"]) =>
     title: {
       fontSize: 20,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.text,
       textAlign: "center",
       marginBottom: 8,
     },
     message: {
       fontSize: 16,
+      fontFamily: typography.fonts.regular,
       color: colors.textSecondary,
       textAlign: "center",
       lineHeight: 24,

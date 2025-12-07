@@ -3,6 +3,8 @@
  * Supports both light and dark modes
  */
 
+import { FontFamily } from "./fonts";
+
 export type ThemeMode = "light" | "dark";
 
 export interface ThemeColors {
@@ -45,6 +47,15 @@ export interface ThemeColors {
   // Button colors
   buttonText: string;
   buttonBackground: string;
+
+  // Shadows colors
+  shadows: {
+    shadowColor: string;
+    shadowOffset: { width: number; height: number };
+    shadowOpacity: number;
+    shadowRadius: number;
+    elevation?: number;
+  };
 }
 
 export interface Theme {
@@ -93,6 +104,8 @@ export const typography = {
     semibold: "600" as const,
     bold: "700" as const,
   },
+  // Font families - Space Grotesk from Google Fonts
+  fonts: FontFamily,
 } as const;
 
 // Light mode colors
@@ -136,6 +149,15 @@ const lightColors: ThemeColors = {
   // Button colors
   buttonText: "#FFFFFF",
   buttonBackground: "#0891B2",
+
+  // Shadows colors
+  shadows: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
 };
 
 // Dark mode colors
@@ -179,6 +201,15 @@ const darkColors: ThemeColors = {
   // Button colors
   buttonText: "#0F0F1A",
   buttonBackground: "#22D3EE",
+
+  // Shadows colors
+  shadows: {
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
 };
 
 // Create theme object

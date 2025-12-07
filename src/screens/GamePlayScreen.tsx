@@ -3,6 +3,9 @@
  * Implements:
  * - GH-004: Start and stop timer
  * - GH-005: View animated countdown
+ * - GH-008: Mark game winner
+ * - GH-009: Score snooker points
+ * - GH-010: Handle snooker fouls
  *
  * Acceptance Criteria (GH-004):
  * - Timer displays in center of screen as large circle ✅
@@ -18,24 +21,49 @@
  * - Animation runs at 60fps without stuttering ✅
  * - Color changes as time gets low (green → yellow → red) ✅
  * - Animation pauses when timer is stopped ✅
+ *
+ * Acceptance Criteria (GH-008):
+ * - Two buttons to mark Player 1 or Player 2 as winner ✅
+ * - Win count increments for selected player ✅
+ * - Current win counts displayed on game screen ✅
+ * - Confirmation or undo option for accidental taps ✅
+ * - Win is saved to rivalry history ✅
+ *
+ * Acceptance Criteria (GH-009):
+ * - Colored buttons for each ball: Red(1), Yellow(2), Green(3), Brown(4), Blue(5), Pink(6), Black(7) ✅
+ * - Tapping adds points to current player's frame score ✅
+ * - Running total displayed for each player ✅
+ * - Points visually animate when added ✅
+ * - Undo last point option available ✅
+ *
+ * Acceptance Criteria (GH-010):
+ * - Foul button opens point selection (4, 5, 6, 7) ✅
+ * - Selected foul points added to opponent's score ✅
+ * - Foul is recorded/indicated in current frame ✅
+ * - Turn switches to opponent after foul ✅
  */
 
 import React from "react";
-import { Dimensions, Pressable, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 
 import { CircularTimer } from "../components/game/CircularTimer";
 import { GameHeader } from "../components/game/GameHeader";
 import { PlayerIndicator } from "../components/game/PlayerIndicator";
 import { ScoreDisplay } from "../components/game/ScoreDisplay";
+import { ScoringPanel } from "../components/game/ScoringPanel";
 import { TimerInstructions } from "../components/game/TimerInstructions";
+import { WinnerModal } from "../components/game/WinnerModal";
 import { useTheme } from "../components/providers/ThemeProvider";
 import { useGamePlay } from "../hooks/useGamePlay";
+import { useScoring } from "../hooks/useScoring";
+import { useAppSelector } from "../store/hooks";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const TIMER_SIZE = Math.min(SCREEN_WIDTH - 64, 320);
+const TIMER_SIZE = Math.min(SCREEN_WIDTH - 48, 300);
 
 export function GamePlayScreen() {
   const { theme } = useTheme();
+  const hapticEnabled = useAppSelector((state) => state.settings.hapticEnabled);
 
   const {
     gameMode,
@@ -54,11 +82,29 @@ export function GamePlayScreen() {
     router,
   } = useGamePlay();
 
+  const {
+    currentPlayer,
+    player1FrameScore,
+    player2FrameScore,
+    player1SessionWins,
+    player2SessionWins,
+    winnerModalVisible,
+    canUndo,
+    handleBallPress,
+    handleFoul,
+    handleOpenWinnerModal,
+    handleCloseWinnerModal,
+    handleSelectWinner,
+    handleUndo,
+  } = useScoring({ hapticEnabled });
+
   // Redirect if no game mode
   if (!gameMode) {
     router.replace("/");
     return null;
   }
+
+  const isSnooker = gameMode === "snooker";
 
   return (
     <View
@@ -66,6 +112,7 @@ export function GamePlayScreen() {
     >
       {/* Header */}
       <GameHeader
+        gameMode={gameMode}
         modeConfig={modeConfig}
         timerState={timerState}
         textColor={theme.colors.text}
@@ -83,15 +130,17 @@ export function GamePlayScreen() {
       />
 
       {/* Timer */}
-      <Pressable onPress={handleTimerPress} style={styles.timerContainer}>
+      <View style={styles.timerContainer}>
         <CircularTimer
           size={TIMER_SIZE}
-          strokeWidth={16}
+          strokeWidth={14}
           progress={progress}
           remainingTime={remainingTime}
           timerState={timerState}
+          onPress={handleTimerPress}
+          hapticEnabled={hapticEnabled}
         />
-      </Pressable>
+      </View>
 
       {/* Instructions */}
       <View style={styles.instructionsSection}>
@@ -101,19 +150,78 @@ export function GamePlayScreen() {
         />
       </View>
 
-      {/* Score display */}
-      <View style={styles.scoreSection}>
-        <ScoreDisplay
+      {/* Score display - Win count (Billiard mode only - Snooker shows in ScoringPanel) */}
+      {!isSnooker && (
+        <View style={styles.scoreSection}>
+          <ScoreDisplay
+            player1Name={player1Name}
+            player2Name={player2Name}
+            player1Wins={player1SessionWins}
+            player2Wins={player2SessionWins}
+            colors={{
+              surface: theme.colors.surface,
+              text: theme.colors.text,
+              textSecondary: theme.colors.textSecondary,
+              border: theme.colors.border,
+            }}
+          />
+        </View>
+      )}
+
+      {/* Scoring Panel (snooker mode has ball buttons, both modes have win button) */}
+      <View style={styles.scoringSection}>
+        <ScoringPanel
+          gameMode={gameMode}
           player1Name={player1Name}
           player2Name={player2Name}
+          currentPlayer={currentPlayer}
+          player1FrameScore={player1FrameScore}
+          player2FrameScore={player2FrameScore}
+          player1SessionWins={player1SessionWins}
+          player2SessionWins={player2SessionWins}
+          onBallPress={handleBallPress}
+          onFoul={handleFoul}
+          onWinFrame={handleOpenWinnerModal}
+          onUndo={handleUndo}
+          canUndo={canUndo}
           colors={{
             surface: theme.colors.surface,
+            surfaceElevated: theme.colors.surfaceElevated,
             text: theme.colors.text,
             textSecondary: theme.colors.textSecondary,
+            textMuted: theme.colors.textMuted,
+            primary: theme.colors.primary,
+            error: theme.colors.error,
+            success: theme.colors.success,
             border: theme.colors.border,
+            buttonBackground: theme.colors.buttonBackground,
+            buttonText: theme.colors.buttonText,
           }}
+          hapticEnabled={hapticEnabled}
         />
       </View>
+
+      {/* Winner Modal */}
+      <WinnerModal
+        visible={winnerModalVisible}
+        onClose={handleCloseWinnerModal}
+        onSelectWinner={handleSelectWinner}
+        player1Name={player1Name}
+        player2Name={player2Name}
+        player1Score={isSnooker ? player1FrameScore : player1SessionWins}
+        player2Score={isSnooker ? player2FrameScore : player2SessionWins}
+        frameLabel={isSnooker ? "Frame" : "Game"}
+        colors={{
+          modalBackground: "rgba(0, 0, 0, 0.6)",
+          modalSurface: theme.colors.surface,
+          modalText: theme.colors.text,
+          modalTextSecondary: theme.colors.textSecondary,
+          success: theme.colors.success,
+          primary: theme.colors.primary,
+          border: theme.colors.border,
+        }}
+        hapticEnabled={hapticEnabled}
+      />
     </View>
   );
 }
@@ -126,12 +234,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    minHeight: 200,
   },
   instructionsSection: {
     paddingHorizontal: 32,
-    paddingVertical: 16,
+    paddingVertical: 8,
   },
   scoreSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 12,
+  },
+  scoringSection: {
     paddingHorizontal: 24,
     paddingBottom: 24,
   },

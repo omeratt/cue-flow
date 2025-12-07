@@ -1,8 +1,15 @@
 /**
  * Root layout for CueFlow app
- * Sets up providers and navigation
+ * Sets up providers, navigation, and custom fonts
  */
 
+import {
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_600SemiBold,
+  SpaceGrotesk_700Bold,
+  useFonts,
+} from "@expo-google-fonts/space-grotesk";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -50,6 +57,24 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontsError] = useFonts({
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
+    SpaceGrotesk_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsError) {
+      console.error("Error loading fonts:", fontsError);
+    }
+  }, [fontsError]);
+
+  // Show loading screen while fonts are loading
+  if (!fontsLoaded && !fontsError) {
+    return <LoadingScreen />;
+  }
+
   return (
     <Provider store={store}>
       <PersistGate loading={<LoadingScreen />} persistor={persistor}>

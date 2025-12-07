@@ -10,8 +10,10 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { GAME_MODES } from "../../lib/constants/game";
+import { typography } from "../../lib/theme";
 import type { Rivalry } from "../../types/rivalry";
 import { useTheme } from "../providers/ThemeProvider";
+import { GameModeIcon } from "./GameModeIcon";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -73,7 +75,7 @@ export function RivalryCard({ rivalry, onPress, onDelete }: RivalryCardProps) {
     >
       <View style={styles.header}>
         <View style={styles.modeTag}>
-          <Text style={styles.modeIcon}>{modeConfig.icon}</Text>
+          <GameModeIcon mode={rivalry.gameMode} size="sm" />
           <Text style={[styles.modeText, { color: modeColor }]}>
             {modeConfig.label}
           </Text>
@@ -135,17 +137,16 @@ const createStyles = (
     modeTag: {
       flexDirection: "row",
       alignItems: "center",
-    },
-    modeIcon: {
-      fontSize: 16,
-      marginRight: 6,
+      gap: 6,
     },
     modeText: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
     },
     lastPlayed: {
       fontSize: 12,
+      fontFamily: typography.fonts.regular,
       color: colors.textMuted,
     },
     players: {
@@ -162,16 +163,19 @@ const createStyles = (
     playerName: {
       fontSize: 18,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.text,
       marginBottom: 2,
     },
     wins: {
       fontSize: 14,
+      fontFamily: typography.fonts.regular,
       color: colors.textSecondary,
     },
     vs: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.textMuted,
       marginHorizontal: 12,
     },
@@ -182,6 +186,7 @@ const createStyles = (
     },
     totalGames: {
       fontSize: 12,
+      fontFamily: typography.fonts.regular,
       color: colors.textMuted,
       textAlign: "center",
     },

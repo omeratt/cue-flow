@@ -9,6 +9,7 @@ import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
 import type { TimerState } from "../../hooks/useGameTimer";
+import { typography } from "../../lib/theme";
 
 interface TimerInstructionsProps {
   readonly timerState: ReturnType<typeof useSharedValue<TimerState>>;
@@ -54,6 +55,7 @@ export function TimerInstructions({
 const styles = StyleSheet.create({
   instructionText: {
     fontSize: 14,
+    fontFamily: typography.fonts.regular,
     textAlign: "center",
   },
 });

@@ -43,7 +43,7 @@ Follow the phased approach defined in the PRD (Section 9.3):
 | ------- | ----------------------------------------------------------------- | -------------- |
 | Phase 1 | Core timer (home screen, player setup, timer, duration selection) | ✅ Completed   |
 | Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | ✅ Completed   |
-| Phase 3 | Scoring (win tracking, snooker points, fouls)                     | 🔴 Not Started |
+| Phase 3 | Scoring (win tracking, snooker points, fouls)                     | ✅ Completed   |
 | Phase 4 | Rivalry system (persistence, history, continue/delete)            | 🔴 Not Started |
 | Phase 5 | Polish & testing                                                  | 🔴 Not Started |
 
@@ -54,16 +54,13 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-001**: Select game mode ✅ COMPLETED
 - **GH-002**: Enter player names ✅ COMPLETED
 - **GH-003**: Select timer duration ✅ COMPLETED
-- **GH-004**: Start and stop timer
-- **GH-005**: View animated countdown
-- **GH-006**: Hear audio alerts
 - **GH-004**: Start and stop timer ✅ COMPLETED
 - **GH-005**: View animated countdown ✅ COMPLETED
 - **GH-006**: Hear audio alerts ✅ COMPLETED
 - **GH-007**: Feel haptic feedback ✅ COMPLETED
-- **GH-008**: Mark game winner
-- **GH-009**: Score snooker points
-- **GH-010**: Handle snooker fouls
+- **GH-008**: Mark game winner ✅ COMPLETED
+- **GH-009**: Score snooker points ✅ COMPLETED
+- **GH-010**: Handle snooker fouls ✅ COMPLETED
 - **GH-011**: View rivalry history ✅ COMPLETED (basic UI)
 - **GH-012**: Continue existing rivalry ✅ COMPLETED
 - **GH-013**: Delete rivalry
@@ -209,8 +206,8 @@ Check these locations for reusable components before creating new ones:
 
 **Last Updated**: December 7, 2025
 
-**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-007, GH-011 (basic), GH-012, GH-014, GH-015, GH-016, GH-017
+**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-007, GH-008, GH-009, GH-010, GH-011 (basic), GH-012, GH-014, GH-015, GH-016, GH-017
 
-**Completed Phases**: Phase 1 (Core timer), Phase 2 (Audio & polish)
+**Completed Phases**: Phase 1 (Core timer), Phase 2 (Audio & polish), Phase 3 (Scoring)
 
-**Next Up**: Phase 3 - Scoring (GH-008, GH-009, GH-010)
+**Next Up**: Phase 4 - Rivalry system (GH-013: Delete rivalry, improve GH-011 rivalry history)

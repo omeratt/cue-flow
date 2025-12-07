@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../components/providers/ThemeProvider";
+import { typography } from "../lib/theme";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   setTheme,
@@ -280,6 +281,7 @@ const themeOptionStyles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: typography.fonts.semiBold,
   },
 });
 
@@ -352,6 +354,7 @@ const createStyles = (
     headerTitle: {
       fontSize: 18,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.text,
     },
     headerSpacer: {
@@ -370,6 +373,7 @@ const createStyles = (
     sectionTitle: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: typography.fonts.semiBold,
       color: colors.textMuted,
       textTransform: "uppercase",
       letterSpacing: 1,
@@ -407,10 +411,12 @@ const createStyles = (
     settingLabel: {
       fontSize: 16,
       fontWeight: "500",
+      fontFamily: typography.fonts.medium,
       color: colors.text,
     },
     settingDescription: {
       fontSize: 13,
+      fontFamily: typography.fonts.regular,
       color: colors.textSecondary,
       marginTop: 2,
     },
