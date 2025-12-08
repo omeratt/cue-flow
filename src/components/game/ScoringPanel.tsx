@@ -10,10 +10,10 @@
  * - Undo last action button
  */
 
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
 import type {
   FoulValue,
   GameMode,
@@ -21,7 +21,7 @@ import type {
 } from "../../lib/constants/game";
 import { typography } from "../../lib/theme";
 import { BallButtonRow } from "./BallButtonRow";
-import { FoulButton } from "./FoulButton";
+import { ScoringPanelButtons } from "./ScoringPanelButtons";
 
 interface ScoringPanelColors {
   surface: string;
@@ -74,71 +74,71 @@ export function ScoringPanel({
 }: ScoringPanelProps) {
   const isSnooker = gameMode === "snooker";
 
+  const player1Wins = isSnooker ? player1FrameScore : player1SessionWins;
+  const player2Wins = isSnooker ? player2FrameScore : player2SessionWins;
+
   return (
-    <View
+    <SafeAreaView
+      edges={["bottom"]}
       style={[
         styles.container,
         { backgroundColor: colors.surface, borderColor: colors.border },
       ]}
     >
       {/* Snooker Scoring Header */}
-      {isSnooker && (
-        <View style={styles.snookerScoresContainer}>
-          {/* Frames Won - smaller, on top */}
-          <View style={styles.framesWonRow}>
+      <View style={styles.snookerScoresContainer}>
+        {/* Action buttons row */}
+        <ScoringPanelButtons
+          gameMode={gameMode}
+          onUndo={onUndo}
+          canUndo={canUndo}
+          onFoul={onFoul}
+          onWin={onWinFrame}
+          colors={{
+            surfaceElevated: colors.surfaceElevated,
+            text: colors.text,
+            textMuted: colors.textMuted,
+            textSecondary: colors.textSecondary,
+            border: colors.border,
+            buttonBackground: colors.buttonBackground,
+            buttonText: colors.buttonText,
+            surface: colors.surface,
+            error: colors.error,
+            success: colors.success,
+          }}
+          hapticEnabled={hapticEnabled}
+        />
+
+        <View style={styles.scoreContainer}>
+          <View style={[styles.playerScore]}>
             <Text
-              style={[styles.framesWonLabel, { color: colors.textSecondary }]}
+              style={[styles.playerName, { color: colors.textSecondary }]}
+              numberOfLines={1}
             >
               {player1Name}
             </Text>
-            <View style={styles.framesWonScoreContainer}>
-              <Text style={[styles.framesWonValue, { color: colors.text }]}>
-                {player1SessionWins}
-              </Text>
-              <Text
-                style={[
-                  styles.framesWonDivider,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                –
-              </Text>
-              <Text style={[styles.framesWonValue, { color: colors.text }]}>
-                {player2SessionWins}
-              </Text>
-            </View>
+            <Text style={[styles.score, { color: colors.primary }]}>
+              {player1Wins}
+            </Text>
+          </View>
+
+          <View style={styles.divider}>
+            <Text style={[styles.vs, { color: colors.textSecondary }]}>—</Text>
+          </View>
+
+          <View style={[styles.playerScore]}>
             <Text
-              style={[styles.framesWonLabel, { color: colors.textSecondary }]}
+              style={[styles.playerName, { color: colors.textSecondary }]}
+              numberOfLines={1}
             >
               {player2Name}
             </Text>
-          </View>
-
-          <Text
-            style={[styles.framesWonSubtitle, { color: colors.textSecondary }]}
-          >
-            Frames
-          </Text>
-
-          {/* Current Frame Score - larger, prominent */}
-          <View style={styles.currentFrameRow}>
-            <Text style={[styles.currentFrameValue, { color: colors.primary }]}>
-              {player1FrameScore}
-            </Text>
-            <Text
-              style={[
-                styles.currentFrameDivider,
-                { color: colors.textSecondary },
-              ]}
-            >
-              —
-            </Text>
-            <Text style={[styles.currentFrameValue, { color: colors.primary }]}>
-              {player2FrameScore}
+            <Text style={[styles.score, { color: colors.primary }]}>
+              {player2Wins}
             </Text>
           </View>
         </View>
-      )}
+      </View>
 
       {/* Ball buttons (Snooker only) */}
       {isSnooker && (
@@ -147,63 +147,7 @@ export function ScoringPanel({
           hapticEnabled={hapticEnabled}
         />
       )}
-
-      {/* Action buttons row */}
-      <View style={styles.actionsRow}>
-        {/* Undo button - icon only for cleaner look */}
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.undoButton,
-            {
-              backgroundColor: canUndo ? colors.surfaceElevated : "transparent",
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={onUndo}
-          disabled={!canUndo}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name="arrow-undo"
-            size={18}
-            color={canUndo ? colors.text : colors.textMuted}
-          />
-        </TouchableOpacity>
-
-        {/* Foul button (Snooker only) */}
-        {isSnooker && (
-          <FoulButton
-            onFoul={onFoul}
-            colors={{
-              buttonBackground: colors.buttonBackground,
-              buttonText: colors.buttonText,
-              modalBackground: "rgba(0, 0, 0, 0.6)",
-              modalSurface: colors.surface,
-              modalText: colors.text,
-              modalTextSecondary: colors.textSecondary,
-              error: colors.error,
-            }}
-            hapticEnabled={hapticEnabled}
-          />
-        )}
-
-        {/* Win frame/game button */}
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.winButton,
-            { backgroundColor: colors.success },
-          ]}
-          onPress={onWinFrame}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.actionButtonText, { color: "#ffffff" }]}>
-            {isSnooker ? "Frame Win" : "Game Win"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -223,113 +167,36 @@ const styles = StyleSheet.create({
   // New snooker vertical layout styles
   snookerScoresContainer: {
     alignItems: "center",
-    gap: 2,
+    gap: 6,
   },
-  framesWonRow: {
+  scoreContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  framesWonLabel: {
-    fontSize: 11,
-    fontWeight: "500",
-    fontFamily: typography.fonts.medium,
-    minWidth: 60,
-    textAlign: "center",
-  },
-  framesWonScoreContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  framesWonValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    fontFamily: typography.fonts.bold,
-  },
-  framesWonDivider: {
-    fontSize: 12,
-    fontFamily: typography.fonts.regular,
-  },
-  framesWonSubtitle: {
-    fontSize: 9,
-    fontWeight: "500",
-    fontFamily: typography.fonts.medium,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 6,
-  },
-  currentFrameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  currentFrameValue: {
-    fontSize: 46,
-    fontWeight: "700",
-    fontFamily: typography.fonts.bold,
-  },
-  currentFrameDivider: {
-    fontSize: 24,
-    fontFamily: typography.fonts.regular,
-  },
-  currentFrameLabel: {
-    fontSize: 10,
-    fontWeight: "500",
-    fontFamily: typography.fonts.medium,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginTop: 2,
-  },
-  // Legacy styles (kept for compatibility)
-  scoresHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sessionWinsContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  actionsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    marginTop: 4,
-  },
-  actionButton: {
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 16,
+    width: "100%",
+    justifyContent: "space-around",
+  },
+  playerScore: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
-  undoButton: {
-    borderWidth: 1.5,
-    width: 44,
-    height: 44,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+  playerName: {
+    fontSize: 32,
+    fontWeight: "500",
+    fontFamily: typography.fonts.medium,
+    marginBottom: 4,
   },
-  winButton: {
-    minWidth: 100,
-    // Premium shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  disabledButton: {
-    opacity: 0.4,
-  },
-  actionButtonText: {
-    fontSize: 13,
+  score: {
+    fontSize: 42,
     fontWeight: "700",
     fontFamily: typography.fonts.bold,
-    letterSpacing: 0.5,
+  },
+  divider: {
+    paddingHorizontal: 16,
+  },
+  vs: {
+    fontSize: 20,
+    fontFamily: typography.fonts.regular,
   },
 });

@@ -49,7 +49,6 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { CircularTimer } from "../components/game/CircularTimer";
 import { GameHeader } from "../components/game/GameHeader";
 import { PlayerIndicator } from "../components/game/PlayerIndicator";
-import { ScoreDisplay } from "../components/game/ScoreDisplay";
 import { ScoringPanel } from "../components/game/ScoringPanel";
 import { TimerInstructions } from "../components/game/TimerInstructions";
 import { WinnerModal } from "../components/game/WinnerModal";
@@ -150,56 +149,36 @@ export function GamePlayScreen() {
         />
       </View>
 
-      {/* Score display - Win count (Billiard mode only - Snooker shows in ScoringPanel) */}
-      {!isSnooker && (
-        <View style={styles.scoreSection}>
-          <ScoreDisplay
-            player1Name={player1Name}
-            player2Name={player2Name}
-            player1Wins={player1SessionWins}
-            player2Wins={player2SessionWins}
-            colors={{
-              surface: theme.colors.surface,
-              text: theme.colors.text,
-              textSecondary: theme.colors.textSecondary,
-              border: theme.colors.border,
-            }}
-          />
-        </View>
-      )}
-
       {/* Scoring Panel (snooker mode has ball buttons, both modes have win button) */}
-      <View style={styles.scoringSection}>
-        <ScoringPanel
-          gameMode={gameMode}
-          player1Name={player1Name}
-          player2Name={player2Name}
-          currentPlayer={currentPlayer}
-          player1FrameScore={player1FrameScore}
-          player2FrameScore={player2FrameScore}
-          player1SessionWins={player1SessionWins}
-          player2SessionWins={player2SessionWins}
-          onBallPress={handleBallPress}
-          onFoul={handleFoul}
-          onWinFrame={handleOpenWinnerModal}
-          onUndo={handleUndo}
-          canUndo={canUndo}
-          colors={{
-            surface: theme.colors.surface,
-            surfaceElevated: theme.colors.surfaceElevated,
-            text: theme.colors.text,
-            textSecondary: theme.colors.textSecondary,
-            textMuted: theme.colors.textMuted,
-            primary: theme.colors.primary,
-            error: theme.colors.error,
-            success: theme.colors.success,
-            border: theme.colors.border,
-            buttonBackground: theme.colors.buttonBackground,
-            buttonText: theme.colors.buttonText,
-          }}
-          hapticEnabled={hapticEnabled}
-        />
-      </View>
+      <ScoringPanel
+        gameMode={gameMode}
+        player1Name={player1Name}
+        player2Name={player2Name}
+        currentPlayer={currentPlayer}
+        player1FrameScore={player1FrameScore}
+        player2FrameScore={player2FrameScore}
+        player1SessionWins={player1SessionWins}
+        player2SessionWins={player2SessionWins}
+        onBallPress={handleBallPress}
+        onFoul={handleFoul}
+        onWinFrame={handleOpenWinnerModal}
+        onUndo={handleUndo}
+        canUndo={canUndo}
+        colors={{
+          surface: theme.colors.surface,
+          surfaceElevated: theme.colors.surfaceElevated,
+          text: theme.colors.text,
+          textSecondary: theme.colors.textSecondary,
+          textMuted: theme.colors.textMuted,
+          primary: theme.colors.primary,
+          error: theme.colors.error,
+          success: theme.colors.success,
+          border: theme.colors.border,
+          buttonBackground: theme.colors.buttonBackground,
+          buttonText: theme.colors.buttonText,
+        }}
+        hapticEnabled={hapticEnabled}
+      />
 
       {/* Winner Modal */}
       <WinnerModal
@@ -239,13 +218,5 @@ const styles = StyleSheet.create({
   instructionsSection: {
     paddingHorizontal: 32,
     paddingVertical: 8,
-  },
-  scoreSection: {
-    paddingHorizontal: 24,
-    paddingBottom: 12,
-  },
-  scoringSection: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
   },
 });

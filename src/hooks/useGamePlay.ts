@@ -52,10 +52,7 @@ export function useGamePlay() {
 
   const handlePlayerSwitch = useCallback(() => {
     dispatch(switchPlayer());
-    if (hapticEnabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-  }, [dispatch, hapticEnabled]);
+  }, [dispatch]);
 
   const handleTick = useCallback(
     (remainingSeconds: number) => {
@@ -99,10 +96,7 @@ export function useGamePlay() {
       timerAudio.stopTicking();
     }
     timer.handleTap();
-    if (hapticEnabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-  }, [timer, hapticEnabled, timerAudio]);
+  }, [timer, timerAudio]);
 
   // Handle back button - stop ticking before navigating away
   const handleBack = useCallback(() => {
@@ -123,10 +117,7 @@ export function useGamePlay() {
       dispatch(resumeGame());
       // Note: ticking will resume automatically via handleTick when timer runs
     }
-    if (hapticEnabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  }, [timer, dispatch, hapticEnabled, timerAudio]);
+  }, [timer, dispatch, timerAudio]);
 
   // Get sound enabled state from Redux
   const soundEnabled = useAppSelector((state) => state.settings.soundEnabled);

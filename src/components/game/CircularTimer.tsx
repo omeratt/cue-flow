@@ -67,28 +67,39 @@ export function CircularTimer({
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-
+  let timer;
   // Press handlers for animation
   const handlePressIn = useCallback(() => {
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+
     scale.value = withSpring(0.95, {
-      damping: 15,
+      damping: 25,
       stiffness: 400,
     });
-  }, [scale]);
+  }, [hapticEnabled, scale]);
 
   const handlePressOut = useCallback(() => {
+    if (hapticEnabled) {
+      clearTimeout(timer);
+
+      setTimeout(async () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid).finally(() =>
+          clearTimeout(timer)
+        );
+      }, 90);
+    }
+
     scale.value = withSpring(1, {
-      damping: 12,
+      damping: 25,
       stiffness: 300,
     });
-  }, [scale]);
+  }, [hapticEnabled, scale, timer]);
 
   const handlePress = useCallback(() => {
-    if (hapticEnabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
     onPress?.();
-  }, [hapticEnabled, onPress]);
+  }, [onPress]);
 
   // Sync timer state to React state for text display
   useAnimatedReaction(

@@ -32,9 +32,9 @@ export function PlayerIndicator({
 
   // Animate player name on change
   useEffect(() => {
-    playerNameScale.value = withSpring(1.1, { damping: 10 });
+    playerNameScale.value = withSpring(1.1, { damping: 55 });
     const timeoutId = setTimeout(() => {
-      playerNameScale.value = withSpring(1, { damping: 10 });
+      playerNameScale.value = withSpring(1, { damping: 55 });
     }, 150);
 
     return () => clearTimeout(timeoutId);

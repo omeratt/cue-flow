@@ -153,7 +153,7 @@ src/
 │   └── game/
 │       ├── GameHeader.tsx          # Header component
 │       ├── PlayerIndicator.tsx     # Player display
-│       ├── ScoreDisplay.tsx        # Score component
+│       ├── ScoringPanel.tsx        # Score component
 │       └── TimerInstructions.tsx   # Instructions text
 ```
 
