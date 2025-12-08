@@ -20,10 +20,9 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 interface RivalryCardProps {
   readonly rivalry: Rivalry;
   readonly onPress: (rivalry: Rivalry) => void;
-  readonly onDelete?: (rivalry: Rivalry) => void;
 }
 
-export function RivalryCard({ rivalry, onPress, onDelete }: RivalryCardProps) {
+export function RivalryCard({ rivalry, onPress }: RivalryCardProps) {
   const { theme } = useTheme();
   const pressed = useSharedValue(0);
 

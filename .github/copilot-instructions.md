@@ -44,8 +44,8 @@ Follow the phased approach defined in the PRD (Section 9.3):
 | Phase 1 | Core timer (home screen, player setup, timer, duration selection) | ✅ Completed   |
 | Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | ✅ Completed   |
 | Phase 3 | Scoring (win tracking, snooker points, fouls)                     | ✅ Completed   |
-| Phase 4 | Rivalry system (persistence, history, continue/delete)            | 🔴 Not Started |
-| Phase 5 | Polish & testing                                                  | 🔴 Not Started |
+| Phase 4 | Rivalry system (persistence, history, continue/delete)            | ✅ Completed   |
+| Phase 5 | Polish & testing                                                  | 🟡 In Progress |
 
 ### 3. User Story Reference
 
@@ -63,7 +63,7 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-010**: Handle snooker fouls ✅ COMPLETED
 - **GH-011**: View rivalry history ✅ COMPLETED (basic UI)
 - **GH-012**: Continue existing rivalry ✅ COMPLETED
-- **GH-013**: Delete rivalry
+- **GH-013**: Delete rivalry ✅ COMPLETED
 - **GH-014**: Toggle theme ✅ COMPLETED
 - **GH-015**: Pause and resume game ✅ COMPLETED
 - **GH-016**: Mute sounds ✅ COMPLETED
@@ -204,10 +204,10 @@ Check these locations for reusable components before creating new ones:
 
 ## Current Session Status
 
-**Last Updated**: December 7, 2025
+**Last Updated**: December 8, 2025
 
-**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-007, GH-008, GH-009, GH-010, GH-011 (basic), GH-012, GH-014, GH-015, GH-016, GH-017
+**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-007, GH-008, GH-009, GH-010, GH-011 (basic), GH-012, GH-013, GH-014, GH-015, GH-016, GH-017
 
-**Completed Phases**: Phase 1 (Core timer), Phase 2 (Audio & polish), Phase 3 (Scoring)
+**Completed Phases**: Phase 1 (Core timer), Phase 2 (Audio & polish), Phase 3 (Scoring), Phase 4 (Rivalry system)
 
-**Next Up**: Phase 4 - Rivalry system (GH-013: Delete rivalry, improve GH-011 rivalry history)
+**Next Up**: Phase 5 - Polish & testing

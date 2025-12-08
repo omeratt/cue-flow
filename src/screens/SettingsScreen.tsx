@@ -6,7 +6,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -16,9 +16,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../components/providers/ThemeProvider";
+import { ConfirmationModal } from "../components/ui/ConfirmationModal";
 import { typography } from "../lib/theme";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { resetGame } from "../store/slices/gameSlice";
+import { clearAllRivalries } from "../store/slices/rivalrySlice";
+import { resetAllScores } from "../store/slices/scoreSlice";
 import {
+  resetSettings,
   setTheme,
   setUseSystemTheme,
   toggleHaptic,
@@ -32,6 +37,9 @@ export function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  // State for clear data confirmation
+  const [showClearDataModal, setShowClearDataModal] = useState(false);
 
   const {
     useSystemTheme,
@@ -69,6 +77,30 @@ export function SettingsScreen() {
     }
     dispatch(toggleHaptic());
   };
+
+  // Clear all data handlers
+  const handleClearDataRequest = useCallback(() => {
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    setShowClearDataModal(true);
+  }, [hapticEnabled]);
+
+  const handleConfirmClearData = useCallback(() => {
+    if (hapticEnabled) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+    // Clear all data
+    dispatch(resetGame());
+    dispatch(resetAllScores());
+    dispatch(clearAllRivalries());
+    dispatch(resetSettings());
+    setShowClearDataModal(false);
+  }, [hapticEnabled, dispatch]);
+
+  const handleCancelClearData = useCallback(() => {
+    setShowClearDataModal(false);
+  }, []);
 
   const handleBack = () => {
     if (hapticEnabled) {
@@ -198,6 +230,48 @@ export function SettingsScreen() {
           </View>
         </View>
 
+        {/* Data Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Data</Text>
+          <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={handleClearDataRequest}
+              activeOpacity={0.7}
+            >
+              <View style={styles.settingInfo}>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    { backgroundColor: `${theme.colors.error}15` },
+                  ]}
+                >
+                  <Ionicons
+                    name="trash-outline"
+                    size={22}
+                    color={theme.colors.error}
+                  />
+                </View>
+                <View style={styles.settingTextContainer}>
+                  <Text
+                    style={[styles.settingLabel, { color: theme.colors.error }]}
+                  >
+                    Clear All Data
+                  </Text>
+                  <Text style={styles.settingDescription}>
+                    Delete all rivalries and reset settings
+                  </Text>
+                </View>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={theme.colors.textMuted}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* App Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
@@ -216,6 +290,18 @@ export function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Clear Data Confirmation Modal */}
+      <ConfirmationModal
+        visible={showClearDataModal}
+        title="Clear All Data?"
+        message="This will delete all your rivalries and reset all settings to defaults. This action cannot be undone."
+        confirmLabel="Clear Data"
+        cancelLabel="Cancel"
+        isDestructive
+        onConfirm={handleConfirmClearData}
+        onCancel={handleCancelClearData}
+      />
     </View>
   );
 }

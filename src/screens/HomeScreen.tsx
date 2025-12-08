@@ -1,12 +1,13 @@
 /**
  * HomeScreen - Main screen with game mode selection and rivalry list
  * Implements GH-001: Select game mode
+ * Implements GH-013: Delete rivalry
  */
 
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -16,14 +17,15 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GameModeCard } from "../components/game/GameModeCard";
-import { RivalryCard } from "../components/game/RivalryCard";
+import { SwipeableRivalryCard } from "../components/game/SwipeableRivalryCard";
 import { useTheme } from "../components/providers/ThemeProvider";
+import { ConfirmationModal } from "../components/ui/ConfirmationModal";
 import { EmptyState } from "../components/ui/EmptyState";
 import type { GameMode } from "../lib/constants/game";
 import { typography } from "../lib/theme";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setGameMode } from "../store/slices/gameSlice";
-import { setActiveRivalry } from "../store/slices/rivalrySlice";
+import { deleteRivalry, setActiveRivalry } from "../store/slices/rivalrySlice";
 import type { Rivalry } from "../types/rivalry";
 
 export function HomeScreen() {
@@ -34,6 +36,9 @@ export function HomeScreen() {
 
   const rivalries = useAppSelector((state) => state.rivalry.rivalries);
   const hapticEnabled = useAppSelector((state) => state.settings.hapticEnabled);
+
+  // State for delete confirmation modal
+  const [rivalryToDelete, setRivalryToDelete] = useState<Rivalry | null>(null);
 
   // Sort rivalries by most recently played
   const sortedRivalries = useMemo(() => {
@@ -61,6 +66,31 @@ export function HomeScreen() {
     }
     router.push("/settings");
   };
+
+  // GH-013: Delete rivalry handlers
+  const handleDeleteRequest = useCallback(
+    (rivalry: Rivalry) => {
+      if (hapticEnabled) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }
+      setRivalryToDelete(rivalry);
+    },
+    [hapticEnabled]
+  );
+
+  const handleConfirmDelete = useCallback(() => {
+    if (rivalryToDelete) {
+      if (hapticEnabled) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      dispatch(deleteRivalry(rivalryToDelete.id));
+      setRivalryToDelete(null);
+    }
+  }, [rivalryToDelete, hapticEnabled, dispatch]);
+
+  const handleCancelDelete = useCallback(() => {
+    setRivalryToDelete(null);
+  }, []);
 
   const styles = createStyles(theme.colors, insets);
 
@@ -104,10 +134,11 @@ export function HomeScreen() {
           <Text style={styles.sectionTitle}>Your Rivalries</Text>
           {sortedRivalries.length > 0 ? (
             sortedRivalries.map((rivalry) => (
-              <RivalryCard
+              <SwipeableRivalryCard
                 key={rivalry.id}
                 rivalry={rivalry}
                 onPress={handleRivalryPress}
+                onDelete={handleDeleteRequest}
               />
             ))
           ) : (
@@ -119,6 +150,22 @@ export function HomeScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Delete Confirmation Modal - GH-013 */}
+      <ConfirmationModal
+        visible={rivalryToDelete !== null}
+        title="Delete Rivalry?"
+        message={
+          rivalryToDelete
+            ? `Are you sure you want to delete the rivalry between ${rivalryToDelete.player1Name} and ${rivalryToDelete.player2Name}? This will remove all game history.`
+            : ""
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        isDestructive
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </View>
   );
 }
