@@ -76,8 +76,9 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-019**: Refactor large components (>150 lines) ✅ COMPLETED
 - **GH-020**: Extract logic from UI components to hooks ✅ COMPLETED
 - **GH-021**: Add micro-interaction animations ✅ COMPLETED
-- **GH-022**: Add screen transition animations 🔲 PENDING
-- **GH-023**: Add animated feedback states 🔲 PENDING
+- **GH-024**: Bug fixes & timer enhancements ✅ COMPLETED
+- **GH-025**: Add screen transition animations 🔲 PENDING
+- **GH-026**: Add animated feedback states 🔲 PENDING
 
 ### 4. Completion Checklist
 
@@ -350,7 +351,78 @@ Add subtle animations for better UX:
 
 ---
 
-### GH-022: Add Screen Transition Animations
+### GH-024: Bug Fixes & Timer Enhancements ✅ COMPLETED
+
+Critical bug fixes and feature enhancements for timer and scoring functionality.
+
+#### 🐛 Bugs Fixed:
+
+| ID      | Description                                                             | Status |
+| ------- | ----------------------------------------------------------------------- | ------ |
+| BUG-001 | When marking a winner - timer should stop and undo history should reset | ✅     |
+| BUG-002 | In Snooker, scoring balls should reset and stop the timer               | ✅     |
+| BUG-003 | Undo functionality in Billiard mode is not working                      | ✅     |
+| BUG-004 | Undo should include last action (points OR wins, not just one type)     | ✅     |
+| BUG-005 | Undo/Redo buttons should stop the timer                                 | ✅     |
+| BUG-006 | Foul in Snooker should stop timer and switch to other player            | ✅     |
+
+#### ✨ Features Added:
+
+| ID       | Description                                                          | Status |
+| -------- | -------------------------------------------------------------------- | ------ |
+| FEAT-001 | Add Redo button with functionality (both Snooker and Billiard)       | ✅     |
+| FEAT-002 | Add Timer Reset button next to Pause button (resets and stops timer) | ✅     |
+| FEAT-003 | Redesign player turn layout: `Player1 --- Switch Button --- Player2` | ✅     |
+| FEAT-004 | Add professional transition animation when switching player turns    | ✅     |
+
+#### 📐 Player Layout Design:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Player1 (dim when inactive)  |  🔄  |  Player2 (highlight) │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Active player: Primary text color with subtle emphasis + slightly larger font
+- Inactive player: Disabled/dimmed text color
+- Switch button: Icon only (no text needed)
+- Beautiful transition animation when players switch
+
+#### 🎯 Logic Summary:
+
+**Billiard Mode:**
+
+- Undo/Redo: Operates only on wins (not points, since Billiard has no point scoring)
+- Timer stops on: undo, redo, win marked
+
+**Snooker Mode:**
+
+- Undo/Redo: Operates on the last action (either points OR wins - unified history)
+- Timer stops + resets on: ball scored, foul
+- Timer stops on: undo, redo, win marked
+- Foul: Stops timer + switches to other player
+
+**Both Modes:**
+
+- New reset timer button next to pause
+- Redesigned player turn layout with animations
+
+**Acceptance Criteria:**
+
+- [x] BUG-001: Timer stops when winner is marked
+- [x] BUG-002: Timer resets and stops on snooker ball scoring
+- [x] BUG-003: Undo works correctly in Billiard mode
+- [x] BUG-004: Undo includes last action (points or wins)
+- [x] BUG-005: Undo/Redo stops the timer
+- [x] BUG-006: Foul stops timer and switches player
+- [x] FEAT-001: Redo button added and functional
+- [x] FEAT-002: Timer reset button added
+- [x] FEAT-003: Player turn layout redesigned
+- [x] FEAT-004: Player switch animation implemented
+
+---
+
+### GH-025: Add Screen Transition Animations
 
 Improve navigation feel:
 
@@ -372,7 +444,7 @@ Improve navigation feel:
 
 ---
 
-### GH-023: Add Animated Feedback States
+### GH-026: Add Animated Feedback States
 
 Add dynamic visual feedback:
 

@@ -1,8 +1,10 @@
 /**
- * GameHeader - Game screen header with back button, mode info, mute, and pause buttons
+ * GameHeader - Game screen header with back button, mode info, mute, reset, and pause buttons
  * Extracted from GamePlayScreen for better component organization
  *
- * Implements partial GH-016: Mute sounds (quick mute button)
+ * Implements:
+ * - Partial GH-016: Mute sounds (quick mute button)
+ * - GH-024 FEAT-002: Timer reset button
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -30,6 +32,7 @@ interface GameHeaderProps {
   readonly textColor: string;
   readonly onBack: () => void;
   readonly onPauseResume: () => void;
+  readonly onResetTimer?: () => void;
   readonly soundEnabled?: boolean;
   readonly onToggleSound?: () => void;
 }
@@ -41,6 +44,7 @@ export function GameHeader({
   textColor,
   onBack,
   onPauseResume,
+  onResetTimer,
   soundEnabled = true,
   onToggleSound,
 }: Readonly<GameHeaderProps>) {
@@ -95,6 +99,17 @@ export function GameHeader({
               size={24}
               color={textColor}
             />
+          </TouchableOpacity>
+        )}
+        {onResetTimer && (
+          <TouchableOpacity
+            onPress={onResetTimer}
+            style={styles.iconButton}
+            accessibilityLabel="Reset timer"
+            accessibilityRole="button"
+            accessibilityHint="Resets and stops the timer"
+          >
+            <Ionicons name="refresh" size={24} color={textColor} />
           </TouchableOpacity>
         )}
         <TouchableOpacity

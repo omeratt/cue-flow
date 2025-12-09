@@ -1,10 +1,10 @@
 /**
  * GamePlayScreen - Main game timer screen
- * Implements GH-004 to GH-010: Timer, countdown, scoring, fouls, winner selection
+ * Implements GH-004 to GH-010, GH-024: Timer, countdown, scoring, fouls, winner selection
  * Refactored in GH-019: Condensed comments, uses composition pattern
  */
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 
 import { GameHeader } from "../components/layout/GameHeader";
@@ -25,7 +25,25 @@ export function GamePlayScreen() {
   const hapticEnabled = useAppSelector((state) => state.settings.hapticEnabled);
 
   const gamePlay = useGamePlay();
-  const scoring = useScoring({ hapticEnabled });
+
+  // Timer control callbacks for scoring integration (GH-024)
+  const handleTimerStop = useCallback(() => {
+    // Stop timer without switching player
+    if (gamePlay.timerState.value === "running") {
+      gamePlay.handlePauseResume();
+    }
+  }, [gamePlay]);
+
+  const handleTimerReset = useCallback(() => {
+    // Reset and stop timer
+    gamePlay.reset();
+  }, [gamePlay]);
+
+  const scoring = useScoring({
+    hapticEnabled,
+    onTimerStop: handleTimerStop,
+    onTimerReset: handleTimerReset,
+  });
 
   // Redirect if no game mode
   if (!gamePlay.gameMode) {
@@ -38,7 +56,7 @@ export function GamePlayScreen() {
     modeConfig,
     player1Name,
     player2Name,
-    currentPlayerName,
+    currentPlayer,
     remainingTime,
     progress,
     timerState,
@@ -57,14 +75,19 @@ export function GamePlayScreen() {
         textColor={theme.colors.text}
         onBack={gamePlay.handleBack}
         onPauseResume={gamePlay.handlePauseResume}
+        onResetTimer={handleTimerReset}
         soundEnabled={soundEnabled}
         onToggleSound={gamePlay.handleToggleSound}
       />
 
       <PlayerIndicator
-        currentPlayerName={currentPlayerName}
-        labelColor={theme.colors.textMuted}
-        nameColor={theme.colors.primary}
+        player1Name={player1Name}
+        player2Name={player2Name}
+        currentPlayer={currentPlayer}
+        onSwitchPlayer={gamePlay.handleManualPlayerSwitch}
+        primaryColor={theme.colors.primary}
+        mutedColor={theme.colors.textMuted}
+        switchButtonColor={theme.colors.textSecondary}
       />
 
       <View style={styles.timerContainer}>
@@ -99,7 +122,9 @@ export function GamePlayScreen() {
         onFoul={scoring.handleFoul}
         onWinFrame={scoring.handleOpenWinnerModal}
         onUndo={scoring.handleUndo}
+        onRedo={scoring.handleRedo}
         canUndo={scoring.canUndo}
+        canRedo={scoring.canRedo}
         colors={{
           surface: theme.colors.surface,
           surfaceElevated: theme.colors.surfaceElevated,

@@ -51,7 +51,9 @@ interface ScoringPanelProps {
   readonly onFoul: (points: FoulValue) => void;
   readonly onWinFrame: () => void;
   readonly onUndo: () => void;
+  readonly onRedo: () => void;
   readonly canUndo: boolean;
+  readonly canRedo: boolean;
   readonly colors: ScoringPanelColors;
   readonly hapticEnabled?: boolean;
 }
@@ -69,7 +71,9 @@ export function ScoringPanel({
   onFoul,
   onWinFrame,
   onUndo,
+  onRedo,
   canUndo,
+  canRedo,
   colors,
   hapticEnabled = true,
 }: ScoringPanelProps) {
@@ -92,7 +96,9 @@ export function ScoringPanel({
         <ScoringPanelButtons
           gameMode={gameMode}
           onUndo={onUndo}
+          onRedo={onRedo}
           canUndo={canUndo}
+          canRedo={canRedo}
           onFoul={onFoul}
           onWin={onWinFrame}
           colors={{

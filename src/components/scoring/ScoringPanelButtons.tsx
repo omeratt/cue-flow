@@ -1,9 +1,10 @@
 /**
  * ScoringPanelButtons - Action buttons row for scoring panel
- * Part of GH-008, GH-009, GH-010 implementation
+ * Part of GH-008, GH-009, GH-010, GH-024 implementation
  *
  * Contains:
  * - Undo button (all modes)
+ * - Redo button (all modes) - FEAT-001
  * - Foul button (Snooker only)
  * - Win button (all modes)
  */
@@ -13,6 +14,7 @@ import { StyleSheet, View } from "react-native";
 
 import type { FoulValue, GameMode } from "../../lib/constants/game";
 import { FoulButton } from "./FoulButton";
+import { RedoButton } from "./RedoButton";
 import { UndoButton } from "./UndoButton";
 import { WinButton } from "./WinButton";
 
@@ -32,7 +34,9 @@ interface ScoringPanelButtonsColors {
 interface ScoringPanelButtonsProps {
   readonly gameMode: GameMode;
   readonly onUndo: () => void;
+  readonly onRedo: () => void;
   readonly canUndo: boolean;
+  readonly canRedo: boolean;
   readonly onFoul: (points: FoulValue) => void;
   readonly onWin: () => void;
   readonly colors: ScoringPanelButtonsColors;
@@ -42,7 +46,9 @@ interface ScoringPanelButtonsProps {
 export function ScoringPanelButtons({
   gameMode,
   onUndo,
+  onRedo,
   canUndo,
+  canRedo,
   onFoul,
   onWin,
   colors,
@@ -52,18 +58,34 @@ export function ScoringPanelButtons({
 
   return (
     <View style={styles.actionsRow}>
-      {/* Undo button */}
-      <UndoButton
-        onUndo={onUndo}
-        canUndo={canUndo}
-        colors={{
-          background: colors.surfaceElevated,
-          backgroundDisabled: "transparent",
-          icon: colors.text,
-          iconDisabled: colors.textMuted,
-          border: colors.border,
-        }}
-      />
+      {/* Undo/Redo buttons container */}
+      <View style={styles.undoRedoContainer}>
+        {/* Undo button */}
+        <UndoButton
+          onUndo={onUndo}
+          canUndo={canUndo}
+          colors={{
+            background: colors.surfaceElevated,
+            backgroundDisabled: "transparent",
+            icon: colors.text,
+            iconDisabled: colors.textMuted,
+            border: colors.border,
+          }}
+        />
+
+        {/* Redo button */}
+        <RedoButton
+          onRedo={onRedo}
+          canRedo={canRedo}
+          colors={{
+            background: colors.surfaceElevated,
+            backgroundDisabled: "transparent",
+            icon: colors.text,
+            iconDisabled: colors.textMuted,
+            border: colors.border,
+          }}
+        />
+      </View>
 
       {/* Foul button (Snooker only) */}
       {isSnooker && (
@@ -97,5 +119,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginBottom: 8,
+  },
+  undoRedoContainer: {
+    flexDirection: "row",
+    gap: 8,
   },
 });

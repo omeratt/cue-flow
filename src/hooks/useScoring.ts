@@ -1,12 +1,14 @@
 /**
  * useScoring - Hook for managing game scoring
- * Implements GH-008, GH-009, GH-010
+ * Implements GH-008, GH-009, GH-010, GH-024
  *
  * Features:
- * - Snooker ball point scoring with undo
+ * - Snooker ball point scoring with undo/redo
  * - Foul handling with points to opponent
  * - Frame/game win tracking
  * - Rivalry history updates
+ * - Unified undo/redo for both points and wins
+ * - Timer control callbacks for integration
  */
 
 import * as Haptics from "expo-haptics";
@@ -15,7 +17,7 @@ import { useCallback, useState } from "react";
 import type { FoulValue, SnookerBallType } from "../lib/constants/game";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { switchPlayer } from "../store/slices/gameSlice";
-import { recordWin } from "../store/slices/rivalrySlice";
+import { recordWin, undoWin } from "../store/slices/rivalrySlice";
 import {
   addBallPoints,
   addFoulPoints,
@@ -23,9 +25,10 @@ import {
   resetAllScores,
   subtractBallPoints,
   subtractFoulPoints,
+  undoFrameWin,
 } from "../store/slices/scoreSlice";
 
-// Action types for undo functionality
+// Action types for undo/redo functionality
 type ScoringAction =
   | {
       type: "ball";
@@ -38,10 +41,12 @@ type ScoringAction =
 
 interface UseScoringOptions {
   hapticEnabled?: boolean;
+  onTimerStop?: () => void;
+  onTimerReset?: () => void;
 }
 
 export function useScoring(options: UseScoringOptions = {}) {
-  const { hapticEnabled = true } = options;
+  const { hapticEnabled = true, onTimerStop, onTimerReset } = options;
   const dispatch = useAppDispatch();
 
   // Get current state from Redux
@@ -68,8 +73,9 @@ export function useScoring(options: UseScoringOptions = {}) {
   );
   const frameNumber = useAppSelector((state) => state.score.frameNumber);
 
-  // Undo stack - keeps track of recent actions
+  // Undo/Redo stacks - keeps track of actions for both modes
   const [undoStack, setUndoStack] = useState<ScoringAction[]>([]);
+  const [redoStack, setRedoStack] = useState<ScoringAction[]>([]);
 
   // Winner modal state
   const [winnerModalVisible, setWinnerModalVisible] = useState(false);
@@ -77,33 +83,41 @@ export function useScoring(options: UseScoringOptions = {}) {
   // Handle ball press (snooker scoring)
   const handleBallPress = useCallback(
     (ballType: SnookerBallType, value: number) => {
+      // Stop and reset timer on ball scoring (BUG-002)
+      onTimerReset?.();
+
       // Add points to current player
       dispatch(addBallPoints({ player: currentPlayer, ball: ballType }));
 
-      // Add to undo stack
+      // Add to undo stack, clear redo stack
       setUndoStack((prev) => [
         ...prev.slice(-9), // Keep last 10 actions
         { type: "ball", player: currentPlayer, ball: ballType, value },
       ]);
+      setRedoStack([]); // Clear redo stack on new action
 
       if (hapticEnabled) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     },
-    [currentPlayer, dispatch, hapticEnabled]
+    [currentPlayer, dispatch, hapticEnabled, onTimerReset]
   );
 
-  // Handle foul
+  // Handle foul (BUG-006: stop timer + switch player)
   const handleFoul = useCallback(
     (points: FoulValue) => {
+      // Stop and reset timer on foul (BUG-006)
+      onTimerReset?.();
+
       // Add foul points to opponent
       dispatch(addFoulPoints({ foulingPlayer: currentPlayer, points }));
 
-      // Add to undo stack
+      // Add to undo stack, clear redo stack
       setUndoStack((prev) => [
         ...prev.slice(-9),
         { type: "foul", foulingPlayer: currentPlayer, points },
       ]);
+      setRedoStack([]);
 
       // Switch player after foul
       dispatch(switchPlayer());
@@ -112,7 +126,7 @@ export function useScoring(options: UseScoringOptions = {}) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
     },
-    [currentPlayer, dispatch, hapticEnabled]
+    [currentPlayer, dispatch, hapticEnabled, onTimerReset]
   );
 
   // Open winner modal
@@ -125,14 +139,18 @@ export function useScoring(options: UseScoringOptions = {}) {
     setWinnerModalVisible(false);
   }, []);
 
-  // Handle frame/game win
+  // Handle frame/game win (BUG-001: stop timer when winner marked)
   const handleSelectWinner = useCallback(
     (winner: "player1" | "player2") => {
+      // Stop timer when winner is marked (BUG-001)
+      onTimerStop?.();
+
       // Record frame win in score slice
       dispatch(recordFrameWin({ winner }));
 
-      // Add to undo stack
+      // Add to undo stack (unified for both modes - BUG-004)
       setUndoStack((prev) => [...prev.slice(-9), { type: "frameWin", winner }]);
+      setRedoStack([]); // Clear redo stack on new action
 
       // Record win in rivalry if active
       if (activeRivalryId) {
@@ -145,12 +163,15 @@ export function useScoring(options: UseScoringOptions = {}) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     },
-    [activeRivalryId, dispatch, hapticEnabled]
+    [activeRivalryId, dispatch, hapticEnabled, onTimerStop]
   );
 
-  // Handle undo
+  // Handle undo (BUG-003, BUG-004, BUG-005: unified undo for both modes)
   const handleUndo = useCallback(() => {
     if (undoStack.length === 0) return;
+
+    // Stop timer on undo (BUG-005)
+    onTimerStop?.();
 
     const lastAction = undoStack.at(-1);
     if (!lastAction) return;
@@ -180,23 +201,83 @@ export function useScoring(options: UseScoringOptions = {}) {
         break;
 
       case "frameWin":
-        // Can't undo frame win for now (would need to revert rivalry too)
-        // Just skip this action type
+        // Undo frame win (BUG-003, BUG-004: now works for both modes)
+        dispatch(undoFrameWin({ winner: lastAction.winner }));
+        // Undo rivalry win if active
+        if (activeRivalryId) {
+          dispatch(undoWin({ id: activeRivalryId, winner: lastAction.winner }));
+        }
         break;
     }
 
-    // Remove from undo stack
+    // Move action from undo stack to redo stack
     setUndoStack((prev) => prev.slice(0, -1));
+    setRedoStack((prev) => [...prev, lastAction]);
 
     if (hapticEnabled) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-  }, [undoStack, dispatch, hapticEnabled]);
+  }, [undoStack, dispatch, hapticEnabled, activeRivalryId, onTimerStop]);
+
+  // Handle redo (FEAT-001: new redo functionality)
+  const handleRedo = useCallback(() => {
+    if (redoStack.length === 0) return;
+
+    // Stop timer on redo (BUG-005)
+    onTimerStop?.();
+
+    const lastUndoneAction = redoStack.at(-1);
+    if (!lastUndoneAction) return;
+
+    // Handle redo based on action type
+    switch (lastUndoneAction.type) {
+      case "ball":
+        // Re-add points for ball
+        dispatch(
+          addBallPoints({
+            player: lastUndoneAction.player,
+            ball: lastUndoneAction.ball,
+          })
+        );
+        break;
+
+      case "foul":
+        // Re-apply foul: add points to opponent and switch player
+        dispatch(
+          addFoulPoints({
+            foulingPlayer: lastUndoneAction.foulingPlayer,
+            points: lastUndoneAction.points,
+          })
+        );
+        dispatch(switchPlayer());
+        break;
+
+      case "frameWin":
+        // Re-record frame win
+        dispatch(recordFrameWin({ winner: lastUndoneAction.winner }));
+        // Re-record rivalry win if active
+        if (activeRivalryId) {
+          dispatch(
+            recordWin({ id: activeRivalryId, winner: lastUndoneAction.winner })
+          );
+        }
+        break;
+    }
+
+    // Move action from redo stack to undo stack
+    setRedoStack((prev) => prev.slice(0, -1));
+    setUndoStack((prev) => [...prev, lastUndoneAction]);
+
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  }, [redoStack, dispatch, hapticEnabled, activeRivalryId, onTimerStop]);
 
   // Reset all scoring (for new game)
   const resetScoring = useCallback(() => {
     dispatch(resetAllScores());
     setUndoStack([]);
+    setRedoStack([]);
   }, [dispatch]);
 
   return {
@@ -212,6 +293,7 @@ export function useScoring(options: UseScoringOptions = {}) {
     frameNumber,
     winnerModalVisible,
     canUndo: undoStack.length > 0,
+    canRedo: redoStack.length > 0,
 
     // Actions
     handleBallPress,
@@ -220,6 +302,7 @@ export function useScoring(options: UseScoringOptions = {}) {
     handleCloseWinnerModal,
     handleSelectWinner,
     handleUndo,
+    handleRedo,
     resetScoring,
   };
 }

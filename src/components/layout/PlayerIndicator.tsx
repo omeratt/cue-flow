@@ -1,13 +1,21 @@
 /**
- * PlayerIndicator - Shows current player's turn with animated name
- * Extracted from GamePlayScreen for better component organization
- * Updated in GH-021: Improved animation to be smooth and non-bouncy
+ * PlayerIndicator - Shows both players with switch button in the middle
+ * Redesigned in GH-024 (FEAT-003): New layout with Player1 --- Switch --- Player2
+ * Updated in GH-024 (FEAT-004): Professional transition animation when switching
+ *
+ * Features:
+ * - Active player: Primary color, larger font, slight glow
+ * - Inactive player: Dimmed/muted color
+ * - Smooth transition animation when players switch
+ * - Switch button in the center
  */
 
-import React, { useEffect, useRef } from "react";
-import { StyleSheet, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -17,73 +25,144 @@ import Animated, {
 import { typography } from "../../lib/theme";
 
 interface PlayerIndicatorProps {
-  readonly currentPlayerName: string;
-  readonly labelColor: string;
-  readonly nameColor: string;
+  readonly player1Name: string;
+  readonly player2Name: string;
+  readonly currentPlayer: "player1" | "player2";
+  readonly onSwitchPlayer: () => void;
+  readonly primaryColor: string;
+  readonly mutedColor: string;
+  readonly switchButtonColor: string;
 }
 
-// Smooth animation config (non-bouncy as per user preference)
-const SCALE_UP_CONFIG = {
-  duration: 100,
-  easing: Easing.out(Easing.quad),
+// Smooth animation configs
+const SWITCH_ANIMATION_CONFIG = {
+  duration: 300,
+  easing: Easing.out(Easing.cubic),
 };
 
-const SCALE_DOWN_CONFIG = {
+const SCALE_PULSE_CONFIG = {
   duration: 150,
   easing: Easing.out(Easing.quad),
 };
 
-const FADE_OUT_CONFIG = {
-  duration: 80,
-  easing: Easing.out(Easing.quad),
-};
-
-const FADE_IN_CONFIG = {
-  duration: 120,
-  easing: Easing.out(Easing.quad),
-};
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function PlayerIndicator({
-  currentPlayerName,
-  labelColor,
-  nameColor,
+  player1Name,
+  player2Name,
+  currentPlayer,
+  onSwitchPlayer,
+  primaryColor,
+  mutedColor,
+  switchButtonColor,
 }: Readonly<PlayerIndicatorProps>) {
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-  const translateY = useSharedValue(0);
-  const previousName = useRef(currentPlayerName);
+  // Animation values
+  const player1Scale = useSharedValue(currentPlayer === "player1" ? 1.1 : 1);
+  const player2Scale = useSharedValue(currentPlayer === "player2" ? 1.1 : 1);
+  const player1Opacity = useSharedValue(currentPlayer === "player1" ? 1 : 0.5);
+  const player2Opacity = useSharedValue(currentPlayer === "player2" ? 1 : 0.5);
+  const switchButtonRotation = useSharedValue(0);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { translateY: translateY.value }],
-    opacity: opacity.value,
+  // Animate when current player changes
+  useEffect(() => {
+    const isPlayer1Active = currentPlayer === "player1";
+
+    // Animate player 1
+    player1Scale.value = withTiming(
+      isPlayer1Active ? 1.1 : 1,
+      SWITCH_ANIMATION_CONFIG
+    );
+    player1Opacity.value = withTiming(
+      isPlayer1Active ? 1 : 0.5,
+      SWITCH_ANIMATION_CONFIG
+    );
+
+    // Animate player 2
+    player2Scale.value = withTiming(
+      isPlayer1Active ? 1 : 1.1,
+      SWITCH_ANIMATION_CONFIG
+    );
+    player2Opacity.value = withTiming(
+      isPlayer1Active ? 0.5 : 1,
+      SWITCH_ANIMATION_CONFIG
+    );
+
+    // Rotate switch button
+    switchButtonRotation.value = withSequence(
+      withTiming(180, SCALE_PULSE_CONFIG),
+      withTiming(0, { duration: 0 })
+    );
+  }, [
+    currentPlayer,
+    player1Scale,
+    player1Opacity,
+    player2Scale,
+    player2Opacity,
+    switchButtonRotation,
+  ]);
+
+  // Animated styles
+  const player1AnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: player1Scale.value }],
+    opacity: player1Opacity.value,
   }));
 
-  // Animate player name on change with smooth slide
-  useEffect(() => {
-    if (previousName.current !== currentPlayerName) {
-      // Subtle slide down and fade out, then slide up and fade in
-      opacity.value = withSequence(
-        withTiming(0.5, FADE_OUT_CONFIG),
-        withTiming(1, FADE_IN_CONFIG)
-      );
-      translateY.value = withSequence(
-        withTiming(4, FADE_OUT_CONFIG),
-        withTiming(0, FADE_IN_CONFIG)
-      );
-      scale.value = withSequence(
-        withTiming(1.08, SCALE_UP_CONFIG),
-        withTiming(1, SCALE_DOWN_CONFIG)
-      );
-      previousName.current = currentPlayerName;
-    }
-  }, [currentPlayerName, scale, opacity, translateY]);
+  const player2AnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: player2Scale.value }],
+    opacity: player2Opacity.value,
+  }));
+
+  const switchButtonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { rotate: `${switchButtonRotation.value}deg` },
+      {
+        scale: interpolate(
+          switchButtonRotation.value,
+          [0, 90, 180],
+          [1, 1.1, 1]
+        ),
+      },
+    ],
+  }));
+
+  // Get colors based on active state
+  const player1Color = currentPlayer === "player1" ? primaryColor : mutedColor;
+  const player2Color = currentPlayer === "player2" ? primaryColor : mutedColor;
 
   return (
     <View style={styles.container}>
+      {/* Player 1 */}
       <Animated.Text
-        style={[styles.playerName, { color: nameColor }, animatedStyle]}
+        style={[
+          styles.playerName,
+          { color: player1Color },
+          player1AnimatedStyle,
+        ]}
+        numberOfLines={1}
       >
-        {currentPlayerName}
+        {player1Name}
+      </Animated.Text>
+
+      {/* Switch Button */}
+      <AnimatedPressable
+        style={[styles.switchButton, switchButtonAnimatedStyle]}
+        onPress={onSwitchPlayer}
+        accessibilityLabel="Switch player turn"
+        accessibilityRole="button"
+      >
+        <Ionicons name="swap-horizontal" size={24} color={switchButtonColor} />
+      </AnimatedPressable>
+
+      {/* Player 2 */}
+      <Animated.Text
+        style={[
+          styles.playerName,
+          { color: player2Color },
+          player2AnimatedStyle,
+        ]}
+        numberOfLines={1}
+      >
+        {player2Name}
       </Animated.Text>
     </View>
   );
@@ -91,17 +170,25 @@ export function PlayerIndicator({
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: typography.fonts.regular,
-    marginBottom: 4,
+    paddingHorizontal: 24,
   },
   playerName: {
-    fontSize: 28,
-    fontWeight: "700",
-    fontFamily: typography.fonts.bold,
+    fontSize: 24,
+    fontWeight: "600",
+    fontFamily: typography.fonts.semiBold,
+    flex: 1,
+    textAlign: "center",
+  },
+  switchButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 12,
   },
 });

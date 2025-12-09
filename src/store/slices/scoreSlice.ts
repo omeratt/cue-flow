@@ -87,6 +87,18 @@ const scoreSlice = createSlice({
       state.frameNumber += 1;
     },
 
+    // Undo frame/game win (for undo functionality)
+    undoFrameWin: (
+      state,
+      action: PayloadAction<{ winner: "player1" | "player2" }>
+    ) => {
+      const { winner } = action.payload;
+      if (state.sessionWins[winner] > 0) {
+        state.sessionWins[winner] -= 1;
+        state.frameNumber = Math.max(1, state.frameNumber - 1);
+      }
+    },
+
     // Reset current frame score (for new frame)
     resetFrameScore: (state) => {
       state.currentFrameScore = { player1: 0, player2: 0 };
@@ -134,6 +146,7 @@ export const {
   addPoints,
   addFoulPoints,
   recordFrameWin,
+  undoFrameWin,
   resetFrameScore,
   subtractBallPoints,
   subtractFoulPoints,

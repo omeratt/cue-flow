@@ -112,6 +112,17 @@ const rivalrySlice = createSlice({
       }
     },
 
+    // Undo a win (for undo functionality)
+    undoWin: (state, action: PayloadAction<UpdateRivalryPayload>) => {
+      const { id, winner } = action.payload;
+      const rivalry = state.rivalries.find((r) => r.id === id);
+
+      if (rivalry && rivalry.wins[winner] > 0) {
+        rivalry.wins[winner] -= 1;
+        rivalry.totalGamesPlayed = Math.max(0, rivalry.totalGamesPlayed - 1);
+      }
+    },
+
     clearAllRivalries: (state) => {
       state.rivalries = [];
       state.activeRivalryId = null;
@@ -123,6 +134,7 @@ export const {
   createOrFindRivalry,
   setActiveRivalry,
   recordWin,
+  undoWin,
   deleteRivalry,
   clearAllRivalries,
 } = rivalrySlice.actions;

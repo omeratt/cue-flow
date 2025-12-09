@@ -167,12 +167,24 @@ export function useGamePlay() {
     }
   }, [dispatch, hapticEnabled, soundEnabled, timerAudio]);
 
+  // Handle manual player switch (GH-024 FEAT-003)
+  const handleManualPlayerSwitch = useCallback(() => {
+    // Reset timer and switch player
+    timer.reset();
+    timerAudio.stopTicking();
+    dispatch(switchPlayer());
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  }, [timer, timerAudio, dispatch, hapticEnabled]);
+
   return {
     // Game state
     gameMode,
     modeConfig,
     player1Name,
     player2Name,
+    currentPlayer: displayCurrentPlayer,
     currentPlayerName: getCurrentPlayerName(),
 
     // Timer state
@@ -188,6 +200,7 @@ export function useGamePlay() {
     handleBack,
     handlePauseResume,
     handleToggleSound,
+    handleManualPlayerSwitch,
     reset: timer.reset,
 
     // Navigation
