@@ -75,8 +75,8 @@ function RootLayoutNav() {
           name="settings"
           options={{
             animation: "slide_from_bottom",
-            animationDuration: 350,
-            gestureDirection: "vertical",
+            animationDuration: 200,
+            gestureDirection: "horizontal",
             gestureEnabled: true,
           }}
         />

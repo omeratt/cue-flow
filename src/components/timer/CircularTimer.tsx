@@ -57,6 +57,8 @@ export function CircularTimer({
     animatedTextStyle,
     containerStyle,
     pressAnimatedStyle,
+    pulseStyle,
+    shakeStyle,
     handlePressIn,
     handlePressOut,
   } = useCircularTimerAnimation({
@@ -116,29 +118,32 @@ export function CircularTimer({
         { width: size, height: size },
         containerStyle,
         pressAnimatedStyle,
+        shakeStyle,
       ]}
     >
-      <Svg width={size} height={size} style={styles.svg}>
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke={theme.colors.border}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-        />
-        <AnimatedCircle
-          cx={center}
-          cy={center}
-          r={radius}
-          fill="transparent"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          animatedProps={animatedCircleProps}
-          transform={`rotate(-90 ${center} ${center})`}
-        />
-      </Svg>
+      <Animated.View style={[styles.svgContainer, pulseStyle]}>
+        <Svg width={size} height={size}>
+          <Circle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke={theme.colors.border}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+          />
+          <AnimatedCircle
+            cx={center}
+            cy={center}
+            r={radius}
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            animatedProps={animatedCircleProps}
+            transform={`rotate(-90 ${center} ${center})`}
+          />
+        </Svg>
+      </Animated.View>
       <View style={styles.centerContent}>
         <Animated.Text style={[styles.secondsText, animatedTextStyle]}>
           {getDisplayText()}
@@ -170,7 +175,11 @@ export function CircularTimer({
 
 const styles = StyleSheet.create({
   container: { justifyContent: "center", alignItems: "center" },
-  svg: { position: "absolute" },
+  svgContainer: {
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   centerContent: {
     position: "absolute",
     justifyContent: "center",

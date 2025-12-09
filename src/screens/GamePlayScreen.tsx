@@ -1,6 +1,6 @@
 /**
  * GamePlayScreen - Main game timer screen
- * Implements GH-004 to GH-010, GH-024: Timer, countdown, scoring, fouls, winner selection
+ * Implements GH-004 to GH-010, GH-024, GH-026: Timer, countdown, scoring, fouls, winner selection, confetti
  * Refactored in GH-019: Condensed comments, uses composition pattern
  */
 
@@ -14,6 +14,7 @@ import { useTheme } from "../components/providers/ThemeProvider";
 import { ScoringPanel } from "../components/scoring/ScoringPanel";
 import { CircularTimer } from "../components/timer/CircularTimer";
 import { TimerInstructions } from "../components/timer/TimerInstructions";
+import { ConfettiCelebration } from "../components/ui/ConfettiCelebration";
 import { useGamePlay, useScoring } from "../hooks";
 import { useAppSelector } from "../store/hooks";
 
@@ -164,6 +165,12 @@ export function GamePlayScreen() {
           border: theme.colors.border,
         }}
         hapticEnabled={hapticEnabled}
+      />
+
+      {/* GH-026: Confetti celebration on win */}
+      <ConfettiCelebration
+        visible={scoring.showConfetti}
+        onAnimationFinish={scoring.handleConfettiFinish}
       />
     </View>
   );

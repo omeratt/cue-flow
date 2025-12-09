@@ -219,7 +219,11 @@ export function useTimerAudio({
   useEffect(() => {
     return () => {
       if (isTickingPlaying.current) {
-        tickingPlayer.pause();
+        try {
+          tickingPlayer?.pause();
+        } catch {
+          // Player may already be disposed, ignore error
+        }
         isTickingPlaying.current = false;
       }
     };

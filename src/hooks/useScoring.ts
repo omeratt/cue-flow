@@ -80,6 +80,9 @@ export function useScoring(options: UseScoringOptions = {}) {
   // Winner modal state
   const [winnerModalVisible, setWinnerModalVisible] = useState(false);
 
+  // Confetti celebration state (GH-026)
+  const [showConfetti, setShowConfetti] = useState(false);
+
   // Handle ball press (snooker scoring)
   const handleBallPress = useCallback(
     (ballType: SnookerBallType, value: number) => {
@@ -158,6 +161,9 @@ export function useScoring(options: UseScoringOptions = {}) {
       }
 
       setWinnerModalVisible(false);
+
+      // Show confetti celebration (GH-026)
+      setShowConfetti(true);
 
       if (hapticEnabled) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -280,6 +286,11 @@ export function useScoring(options: UseScoringOptions = {}) {
     setRedoStack([]);
   }, [dispatch]);
 
+  // Hide confetti celebration (GH-026)
+  const handleConfettiFinish = useCallback(() => {
+    setShowConfetti(false);
+  }, []);
+
   return {
     // State
     gameMode,
@@ -292,6 +303,7 @@ export function useScoring(options: UseScoringOptions = {}) {
     player2SessionWins,
     frameNumber,
     winnerModalVisible,
+    showConfetti,
     canUndo: undoStack.length > 0,
     canRedo: redoStack.length > 0,
 
@@ -304,5 +316,6 @@ export function useScoring(options: UseScoringOptions = {}) {
     handleUndo,
     handleRedo,
     resetScoring,
+    handleConfettiFinish,
   };
 }
