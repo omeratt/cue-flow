@@ -13,8 +13,8 @@ import Animated, {
 import { GAME_MODES } from "../../lib/constants/game";
 import { typography } from "../../lib/theme";
 import type { Rivalry } from "../../types/rivalry";
+import { GameModeIcon } from "../icons/GameModeIcon";
 import { useTheme } from "../providers/ThemeProvider";
-import { GameModeIcon } from "./GameModeIcon";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 

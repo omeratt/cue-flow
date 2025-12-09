@@ -39,13 +39,14 @@ Before starting any task, review the PRD (`docs/prd.md`) and identify:
 
 Follow the phased approach defined in the PRD (Section 9.3):
 
-| Phase   | Focus                                                             | Status       |
-| ------- | ----------------------------------------------------------------- | ------------ |
-| Phase 1 | Core timer (home screen, player setup, timer, duration selection) | ✅ Completed |
-| Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | ✅ Completed |
-| Phase 3 | Scoring (win tracking, snooker points, fouls)                     | ✅ Completed |
-| Phase 4 | Rivalry system (persistence, history, continue/delete)            | ✅ Completed |
-| Phase 5 | Polish & testing                                                  | ✅ Completed |
+| Phase   | Focus                                                             | Status         |
+| ------- | ----------------------------------------------------------------- | -------------- |
+| Phase 1 | Core timer (home screen, player setup, timer, duration selection) | ✅ Completed   |
+| Phase 2 | Audio & polish (audio alerts, haptics, animations, theme)         | ✅ Completed   |
+| Phase 3 | Scoring (win tracking, snooker points, fouls)                     | ✅ Completed   |
+| Phase 4 | Rivalry system (persistence, history, continue/delete)            | ✅ Completed   |
+| Phase 5 | Polish & testing                                                  | ✅ Completed   |
+| Phase 6 | Code quality, architecture & UI animations                        | 🚧 In Progress |
 
 ### 3. User Story Reference
 
@@ -68,6 +69,15 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-015**: Pause and resume game ✅ COMPLETED
 - **GH-016**: Mute sounds ✅ COMPLETED
 - **GH-017**: Start new rivalry ✅ COMPLETED
+
+### Phase 6: Code Quality & Architecture (GH-018 to GH-023)
+
+- **GH-018**: Reorganize component file hierarchy ✅ COMPLETED
+- **GH-019**: Refactor large components (>150 lines) 🔲 PENDING
+- **GH-020**: Extract logic from UI components to hooks 🔲 PENDING
+- **GH-021**: Add micro-interaction animations 🔲 PENDING
+- **GH-022**: Add screen transition animations 🔲 PENDING
+- **GH-023**: Add animated feedback states 🔲 PENDING
 
 ### 4. Completion Checklist
 
@@ -198,32 +208,188 @@ export function ExampleScreen() {
 
 Check these locations for reusable components before creating new ones:
 
-- `src/components/ui/` - Generic UI components
-- `src/components/game/` - Game-specific components
+- `src/components/ui/` - Generic UI components (ConfirmationModal, EmptyState, ErrorBoundary, LoadingState, SnookerBall)
+- `src/components/cards/` - Card-based components (GameModeCard, RivalryCard, SwipeableRivalryCard)
+- `src/components/timer/` - Timer components (CircularTimer, TimerInstructions)
+- `src/components/scoring/` - Scoring components (ScoringPanel, BallButtonRow, FoulButton, WinButton, UndoButton)
+- `src/components/modals/` - Modal components (WinnerModal)
+- `src/components/layout/` - Layout components (GameHeader, PlayerIndicator)
+- `src/components/icons/` - Icon components (GameModeIcon, PauseResumeIcon)
+- `src/components/providers/` - Context providers (ThemeProvider)
 - `src/hooks/` - Reusable hooks
 
 ## Current Session Status
 
-**Last Updated**: December 8, 2025
+**Last Updated**: December 9, 2025
 
-**Completed Stories**: GH-001, GH-002, GH-003, GH-004, GH-005, GH-006, GH-007, GH-008, GH-009, GH-010, GH-011, GH-012, GH-013, GH-014, GH-015, GH-016, GH-017
+**Completed Stories**: GH-001 to GH-017
 
-**Completed Phases**: All phases completed! ✅
+**Current Phase**: Phase 6 - Code Quality, Architecture & UI Animations 🚧
 
-- Phase 1 (Core timer)
-- Phase 2 (Audio & polish)
-- Phase 3 (Scoring)
-- Phase 4 (Rivalry system)
-- Phase 5 (Polish & testing)
+**Phase 6 Tasks**:
 
-**Phase 5 Polish Improvements**:
+### GH-018: Reorganize Component File Hierarchy
 
-- Fixed unused timer variable in CircularTimer
-- Added app backgrounding support (auto-pause when app goes to background)
-- Added keyboard dismiss on tap outside (GameSetupScreen)
-- Added accessibility labels to key components (CircularTimer, SnookerBall, GameModeCard, FoulButton, GameHeader)
-- Added ErrorBoundary for better error handling
-- Optimized performance with React.memo for list components (RivalryCard, SwipeableRivalryCard)
-- Added reusable LoadingState component
+Restructure `src/components/` from flat `game/` folder to logical categories:
 
-**App Status**: Ready for production! 🚀
+```
+src/components/
+├── ui/              # Generic reusable UI (buttons, modals, loading states)
+│   ├── ConfirmationModal.tsx
+│   ├── EmptyState.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── LoadingState.tsx
+│   └── SnookerBall.tsx
+├── cards/           # Card-based components
+│   ├── GameModeCard.tsx
+│   ├── RivalryCard.tsx
+│   └── SwipeableRivalryCard.tsx
+├── timer/           # Timer-specific components
+│   ├── CircularTimer.tsx
+│   └── TimerInstructions.tsx
+├── scoring/         # Scoring-related components
+│   ├── ScoringPanel.tsx
+│   ├── ScoringPanelButtons.tsx
+│   ├── BallButtonRow.tsx
+│   ├── SnookerBallButton.tsx
+│   ├── FoulButton.tsx
+│   ├── WinButton.tsx
+│   └── UndoButton.tsx
+├── modals/          # Modal components
+│   ├── WinnerModal.tsx
+│   └── ConfirmationModal.tsx (move from ui/)
+├── layout/          # Layout components
+│   ├── GameHeader.tsx
+│   └── PlayerIndicator.tsx
+├── icons/           # Icon components
+│   ├── GameModeIcon.tsx
+│   └── PauseResumeIcon.tsx
+└── providers/       # Context providers
+    └── ThemeProvider.tsx
+```
+
+**Acceptance Criteria:**
+
+- [x] All components moved to appropriate category folders
+- [x] All imports updated across the codebase
+- [x] No broken imports or runtime errors
+- [x] Components are easier to find and maintain
+
+---
+
+### GH-019: Refactor Large Components (>150 lines)
+
+Components to split:
+
+| Component             | Current Lines | Action                                                                                              |
+| --------------------- | ------------- | --------------------------------------------------------------------------------------------------- |
+| `WinnerModal.tsx`     | 384 lines     | Split into `WinnerModalContent`, `WinnerSelectionView`, `WinnerConfirmationView`                    |
+| `CircularTimer.tsx`   | 307 lines     | Extract animation logic to `useCircularTimerAnimation.ts` hook                                      |
+| `GameSetupScreen.tsx` | 444 lines     | Extract `PlayerInputSection`, `DurationSelector`, `DurationButton` components + `useGameSetup` hook |
+| `RivalryCard.tsx`     | 206 lines     | Extract formatting utils, simplify styles                                                           |
+| `ScoringPanel.tsx`    | 203 lines     | Keep as-is (already well composed)                                                                  |
+
+**Acceptance Criteria:**
+
+- [ ] No component file exceeds 150 lines (screens can be up to 200)
+- [ ] Logic extracted to custom hooks
+- [ ] Sub-components are reusable and testable
+- [ ] Code is more readable and maintainable
+
+---
+
+### GH-020: Extract Logic from UI Components to Hooks
+
+Create dedicated hooks:
+
+| Hook                           | Extracted From  | Responsibilities                                         |
+| ------------------------------ | --------------- | -------------------------------------------------------- |
+| `useCircularTimerAnimation.ts` | CircularTimer   | Color interpolation, progress animation, press animation |
+| `useGameSetup.ts`              | GameSetupScreen | Form state, validation, duration selection logic         |
+| `useWinnerModal.ts`            | WinnerModal     | Selection state, confirmation flow, haptic feedback      |
+| `useRivalryCard.ts`            | RivalryCard     | Press animation, date formatting                         |
+
+**Acceptance Criteria:**
+
+- [ ] UI components are pure/presentational (only render + styles)
+- [ ] All business logic lives in hooks
+- [ ] Hooks are testable in isolation
+- [ ] Components receive data and callbacks via props
+
+---
+
+### GH-021: Add Micro-Interaction Animations
+
+Add subtle animations for better UX:
+
+| Element                | Animation                                     |
+| ---------------------- | --------------------------------------------- |
+| Ball buttons (snooker) | Scale pulse + color flash on press            |
+| Score changes          | Animated number counter (increment/decrement) |
+| Win button             | Subtle glow/pulse effect                      |
+| Foul button            | Shake animation on press                      |
+| Player indicator       | Slide transition when switching players       |
+| Duration buttons       | Spring press effect                           |
+| Text inputs            | Focus border animation                        |
+
+**Technology**: React Native Reanimated (already approved)
+
+**Acceptance Criteria:**
+
+- [ ] All interactive elements have press feedback
+- [ ] Score numbers animate when changing
+- [ ] Player switch has smooth transition
+- [ ] Animations run at 60fps
+- [ ] Animations are subtle, not distracting
+
+---
+
+### GH-022: Add Screen Transition Animations
+
+Improve navigation feel:
+
+| Transition       | Animation                                |
+| ---------------- | ---------------------------------------- |
+| Home → Setup     | Slide from right with fade               |
+| Setup → Play     | Fade through with scale                  |
+| Modal open/close | Spring-based slide up with backdrop fade |
+| Back navigation  | Slide back with parallax                 |
+
+**Technology**: Expo Router + React Native Reanimated
+
+**Acceptance Criteria:**
+
+- [ ] All screen transitions are animated
+- [ ] Modals have smooth enter/exit animations
+- [ ] Navigation feels native and fluid
+- [ ] No jarring or instant transitions
+
+---
+
+### GH-023: Add Animated Feedback States
+
+Add dynamic visual feedback:
+
+| State                 | Animation                         |
+| --------------------- | --------------------------------- |
+| Timer running         | Subtle pulse on progress ring     |
+| Timer warning (< 33%) | Color shift + faster pulse        |
+| Timer expired         | Shake + flash effect              |
+| Game won              | Confetti or celebration animation |
+| Rivalry loaded        | Cards slide in staggered          |
+| Empty state           | Fade in with scale                |
+| Loading               | Skeleton shimmer                  |
+
+**Acceptance Criteria:**
+
+- [ ] Visual feedback matches timer state
+- [ ] Warning states are clearly communicated
+- [ ] Success moments feel celebratory
+- [ ] List items animate into view
+- [ ] Loading states are polished
+
+---
+
+**Previous Phases Completed**: Phase 1-5 ✅
+
+**App Status**: Functional, needs code quality and UX polish

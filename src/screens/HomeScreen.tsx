@@ -16,8 +16,8 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { GameModeCard } from "../components/game/GameModeCard";
-import { SwipeableRivalryCard } from "../components/game/SwipeableRivalryCard";
+import { GameModeCard } from "../components/cards/GameModeCard";
+import { SwipeableRivalryCard } from "../components/cards/SwipeableRivalryCard";
 import { useTheme } from "../components/providers/ThemeProvider";
 import { ConfirmationModal } from "../components/ui/ConfirmationModal";
 import { EmptyState } from "../components/ui/EmptyState";

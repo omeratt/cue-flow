@@ -26,7 +26,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { GameModeIcon } from "../components/game/GameModeIcon";
+import { GameModeIcon } from "../components/icons/GameModeIcon";
 import { useTheme } from "../components/providers/ThemeProvider";
 import {
   DEFAULT_TIMER_DURATION,

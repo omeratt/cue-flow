@@ -46,13 +46,13 @@
 import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 
-import { CircularTimer } from "../components/game/CircularTimer";
-import { GameHeader } from "../components/game/GameHeader";
-import { PlayerIndicator } from "../components/game/PlayerIndicator";
-import { ScoringPanel } from "../components/game/ScoringPanel";
-import { TimerInstructions } from "../components/game/TimerInstructions";
-import { WinnerModal } from "../components/game/WinnerModal";
+import { GameHeader } from "../components/layout/GameHeader";
+import { PlayerIndicator } from "../components/layout/PlayerIndicator";
+import { WinnerModal } from "../components/modals/WinnerModal";
 import { useTheme } from "../components/providers/ThemeProvider";
+import { ScoringPanel } from "../components/scoring/ScoringPanel";
+import { CircularTimer } from "../components/timer/CircularTimer";
+import { TimerInstructions } from "../components/timer/TimerInstructions";
 import { useGamePlay } from "../hooks/useGamePlay";
 import { useScoring } from "../hooks/useScoring";
 import { useAppSelector } from "../store/hooks";

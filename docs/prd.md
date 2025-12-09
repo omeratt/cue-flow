@@ -277,10 +277,19 @@ Picture two friends at their local pool hall on a Friday night. They've been pla
   - Delete rivalry feature
 
 - **Phase 5: Polish & testing** (0.5 weeks)
+
   - Bug fixes
   - Performance optimization
   - UI polish
   - Testing on multiple devices
+
+- **Phase 6: Code quality & UI animations** (1 week)
+  - Component file hierarchy reorganization
+  - Refactor large components (>150 lines)
+  - Extract business logic to custom hooks
+  - Add micro-interaction animations
+  - Add screen transition animations
+  - Add animated feedback states
 
 ## 10. User stories
 
@@ -469,4 +478,80 @@ Picture two friends at their local pool hall on a Friday night. They've been pla
 
 ---
 
-Would you like me to create GitHub issues for these user stories?
+## 11. Phase 6: Code Quality & UI Animations
+
+### 11.1 Reorganize component file hierarchy
+
+- **ID**: GH-018
+- **Description**: As a developer, I want the component folder structure to be logically organized so that I can find and maintain components easily.
+- **Acceptance criteria**:
+  - Components organized into logical category folders (ui, cards, timer, scoring, modals, layout, icons, providers)
+  - All components moved from flat `game/` folder to appropriate categories
+  - All imports updated across the codebase
+  - No broken imports or runtime errors
+  - Clear separation between reusable UI components and feature-specific components
+
+### 11.2 Refactor large components
+
+- **ID**: GH-019
+- **Description**: As a developer, I want all components to be under 150 lines so that they are easier to read, test, and maintain.
+- **Acceptance criteria**:
+  - WinnerModal (384 lines) split into smaller sub-components
+  - CircularTimer (307 lines) has animation logic extracted to a hook
+  - GameSetupScreen (444 lines) has form logic extracted to a hook and UI split into sub-components
+  - No component file exceeds 150 lines (screens can be up to 200 lines)
+  - Sub-components are reusable and focused on single responsibilities
+
+### 11.3 Extract logic from UI components to hooks
+
+- **ID**: GH-020
+- **Description**: As a developer, I want UI components to be presentational only so that business logic is testable and reusable.
+- **Acceptance criteria**:
+  - Create useCircularTimerAnimation hook for timer color and progress animations
+  - Create useGameSetup hook for form state, validation, and duration logic
+  - Create useWinnerModal hook for selection state and confirmation flow
+  - Create useRivalryCard hook for press animation and date formatting
+  - UI components receive all data via props
+  - Hooks are testable in isolation
+
+### 11.4 Add micro-interaction animations
+
+- **ID**: GH-021
+- **Description**: As a player, I want subtle animations on interactive elements so that the app feels responsive and polished.
+- **Acceptance criteria**:
+  - Ball buttons have scale pulse and color flash on press
+  - Score changes have animated number counter (increment/decrement)
+  - Win button has subtle glow/pulse effect
+  - Foul button has shake animation on press
+  - Player indicator has slide transition when switching players
+  - Duration buttons have spring press effect
+  - Text inputs have focus border animation
+  - All animations run at 60fps
+
+### 11.5 Add screen transition animations
+
+- **ID**: GH-022
+- **Description**: As a player, I want smooth transitions between screens so that navigation feels native and fluid.
+- **Acceptance criteria**:
+  - Home → Setup transitions with slide from right + fade
+  - Setup → Play transitions with fade through + scale
+  - Modal open/close uses spring-based slide up with backdrop fade
+  - Back navigation has slide back with parallax effect
+  - No jarring or instant screen changes
+  - Animations feel consistent with platform conventions
+
+### 11.6 Add animated feedback states
+
+- **ID**: GH-023
+- **Description**: As a player, I want visual feedback that matches app state so that I always know what's happening.
+- **Acceptance criteria**:
+  - Timer running has subtle pulse on progress ring
+  - Timer warning (<33% remaining) has color shift + faster pulse
+  - Timer expired has shake + flash effect
+  - Game won shows celebration animation (confetti or similar)
+  - Rivalry cards slide in with staggered animation
+  - Empty states fade in with scale
+  - Loading states have skeleton shimmer effect
+  - All feedback animations are visually clear but not distracting
+
+---

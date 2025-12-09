@@ -16,8 +16,8 @@ import { scheduleOnRN } from "react-native-worklets";
 import type { TimerState } from "../../hooks/useGameTimer";
 import type { GameMode } from "../../lib/constants/game";
 import { typography } from "../../lib/theme";
-import { GameModeIcon } from "./GameModeIcon";
-import { PauseResumeIcon } from "./PauseResumeIcon";
+import { GameModeIcon } from "../icons/GameModeIcon";
+import { PauseResumeIcon } from "../icons/PauseResumeIcon";
 
 interface GameModeConfig {
   label: string;
