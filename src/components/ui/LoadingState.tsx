@@ -16,10 +16,7 @@ interface LoadingStateProps {
   readonly size?: "small" | "large";
 }
 
-export function LoadingState({
-  message,
-  size = "large",
-}: LoadingStateProps) {
+export function LoadingState({ message, size = "large" }: LoadingStateProps) {
   const { theme } = useTheme();
 
   return (

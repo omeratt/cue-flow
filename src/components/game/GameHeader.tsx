@@ -100,7 +100,9 @@ export function GameHeader({
         <TouchableOpacity
           onPress={onPauseResume}
           style={styles.iconButton}
-          accessibilityLabel={currentTimerState === "running" ? "Pause timer" : "Resume timer"}
+          accessibilityLabel={
+            currentTimerState === "running" ? "Pause timer" : "Resume timer"
+          }
           accessibilityRole="button"
         >
           <PauseResumeIcon timerState={timerState} color={textColor} />
