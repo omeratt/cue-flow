@@ -20,6 +20,7 @@ import type {
   SnookerBallType,
 } from "../../lib/constants/game";
 import { typography } from "../../lib/theme";
+import { AnimatedScore } from "../ui/AnimatedScore";
 import { BallButtonRow } from "./BallButtonRow";
 import { ScoringPanelButtons } from "./ScoringPanelButtons";
 
@@ -117,9 +118,10 @@ export function ScoringPanel({
             >
               {player1Name}
             </Text>
-            <Text style={[styles.score, { color: colors.primary }]}>
-              {player1Wins}
-            </Text>
+            <AnimatedScore
+              value={player1Wins}
+              style={[styles.score, { color: colors.primary }]}
+            />
           </View>
 
           <View style={styles.divider}>
@@ -133,9 +135,10 @@ export function ScoringPanel({
             >
               {player2Name}
             </Text>
-            <Text style={[styles.score, { color: colors.primary }]}>
-              {player2Wins}
-            </Text>
+            <AnimatedScore
+              value={player2Wins}
+              style={[styles.score, { color: colors.primary }]}
+            />
           </View>
         </View>
       </View>

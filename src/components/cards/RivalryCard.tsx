@@ -2,14 +2,16 @@
  * RivalryCard - Displays a rivalry between two players
  * Memoized for performance when rendering in lists
  * Refactored in GH-019: Extracted formatting utils
+ * Updated in GH-021: Improved to use non-bouncy timing animation
  */
 
-import React, { memo } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { memo, useCallback } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { GAME_MODES } from "../../lib/constants/game";
 import { formatLastPlayed } from "../../lib/dateUtils";
@@ -18,16 +20,27 @@ import type { Rivalry } from "../../types/rivalry";
 import { GameModeIcon } from "../icons/GameModeIcon";
 import { useTheme } from "../providers/ThemeProvider";
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface RivalryCardProps {
   readonly rivalry: Rivalry;
   readonly onPress: (rivalry: Rivalry) => void;
 }
 
+// Smooth, non-bouncy animation config
+const PRESS_IN_CONFIG = {
+  duration: 80,
+  easing: Easing.out(Easing.quad),
+};
+
+const PRESS_OUT_CONFIG = {
+  duration: 120,
+  easing: Easing.out(Easing.quad),
+};
+
 function RivalryCardComponent({ rivalry, onPress }: RivalryCardProps) {
   const { theme } = useTheme();
-  const pressed = useSharedValue(0);
+  const scale = useSharedValue(1);
 
   const modeConfig = GAME_MODES[rivalry.gameMode];
   const modeColor =
@@ -35,23 +48,23 @@ function RivalryCardComponent({ rivalry, onPress }: RivalryCardProps) {
       ? theme.colors.billiard
       : theme.colors.snooker;
 
+  const handlePressIn = useCallback(() => {
+    scale.value = withTiming(0.98, PRESS_IN_CONFIG);
+  }, [scale]);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withTiming(1, PRESS_OUT_CONFIG);
+  }, [scale]);
+
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: withSpring(1 - pressed.value * 0.02, {
-          damping: 15,
-          stiffness: 400,
-        }),
-      },
-    ],
+    transform: [{ scale: scale.value }],
   }));
 
   return (
-    <AnimatedTouchable
+    <AnimatedPressable
       onPress={() => onPress(rivalry)}
-      onPressIn={() => (pressed.value = 1)}
-      onPressOut={() => (pressed.value = 0)}
-      activeOpacity={1}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={[
         styles.card,
         {
@@ -106,7 +119,7 @@ function RivalryCardComponent({ rivalry, onPress }: RivalryCardProps) {
       </View>
 
       <View style={[styles.indicator, { backgroundColor: modeColor }]} />
-    </AnimatedTouchable>
+    </AnimatedPressable>
   );
 }
 

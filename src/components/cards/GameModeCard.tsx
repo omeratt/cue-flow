@@ -1,20 +1,15 @@
 /**
  * GameModeCard - A card component for selecting game mode (Billiard/Snooker)
+ * Updated in GH-021: Improved to use non-bouncy timing animation
  */
 
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native";
+import React, { useCallback } from "react";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import Animated, {
+  Easing,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import type { GameMode } from "../../lib/constants/game";
@@ -23,7 +18,7 @@ import { typography } from "../../lib/theme";
 import { GameModeIcon } from "../icons/GameModeIcon";
 import { useTheme } from "../providers/ThemeProvider";
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface GameModeCardProps {
   readonly mode: GameMode;
@@ -31,9 +26,20 @@ interface GameModeCardProps {
   readonly style?: ViewStyle;
 }
 
+// Smooth, non-bouncy animation config
+const PRESS_IN_CONFIG = {
+  duration: 100,
+  easing: Easing.out(Easing.quad),
+};
+
+const PRESS_OUT_CONFIG = {
+  duration: 150,
+  easing: Easing.out(Easing.quad),
+};
+
 export function GameModeCard({ mode, onPress, style }: GameModeCardProps) {
   const { theme } = useTheme();
-  const pressed = useSharedValue(0);
+  const scale = useSharedValue(1);
   const hovered = useSharedValue(0);
 
   const modeConfig = GAME_MODES[mode];
@@ -45,11 +51,6 @@ export function GameModeCard({ mode, onPress, style }: GameModeCardProps) {
       : theme.colors.snookerLight;
 
   const animatedStyle = useAnimatedStyle(() => {
-    const scale = withSpring(1 - pressed.value * 0.03, {
-      damping: 15,
-      stiffness: 400,
-    });
-
     const backgroundColor = interpolateColor(
       hovered.value,
       [0, 1],
@@ -57,29 +58,28 @@ export function GameModeCard({ mode, onPress, style }: GameModeCardProps) {
     );
 
     return {
-      transform: [{ scale }],
+      transform: [{ scale: scale.value }],
       backgroundColor,
     };
   });
 
-  const handlePressIn = () => {
-    pressed.value = 1;
-    hovered.value = withTiming(1, { duration: 150 });
-  };
+  const handlePressIn = useCallback(() => {
+    scale.value = withTiming(0.97, PRESS_IN_CONFIG);
+    hovered.value = withTiming(1, PRESS_IN_CONFIG);
+  }, [scale, hovered]);
 
-  const handlePressOut = () => {
-    pressed.value = 0;
-    hovered.value = withTiming(0, { duration: 150 });
-  };
+  const handlePressOut = useCallback(() => {
+    scale.value = withTiming(1, PRESS_OUT_CONFIG);
+    hovered.value = withTiming(0, PRESS_OUT_CONFIG);
+  }, [scale, hovered]);
 
   const styles = createStyles(theme.colors, modeColor, modeColorLight);
 
   return (
-    <AnimatedTouchable
+    <AnimatedPressable
       onPress={() => onPress(mode)}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      activeOpacity={1}
       style={[styles.card, animatedStyle, style]}
       accessibilityLabel={`${modeConfig.label} mode. ${modeConfig.description}`}
       accessibilityRole="button"
@@ -93,7 +93,7 @@ export function GameModeCard({ mode, onPress, style }: GameModeCardProps) {
         <Text style={styles.description}>{modeConfig.description}</Text>
       </View>
       <View style={[styles.indicator, { backgroundColor: modeColor }]} />
-    </AnimatedTouchable>
+    </AnimatedPressable>
   );
 }
 

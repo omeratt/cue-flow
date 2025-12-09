@@ -26,14 +26,17 @@ interface UseSnookerBallAnimationReturn {
   handlePress: () => void;
 }
 
+// Smooth, non-bouncy spring config (user preference: no bouncy animations)
 const SPRING_CONFIG_PRESS_IN = {
-  damping: 15,
-  stiffness: 400,
+  damping: 20,
+  stiffness: 300,
+  mass: 1,
 };
 
 const SPRING_CONFIG_PRESS_OUT = {
-  damping: 12,
-  stiffness: 300,
+  damping: 18,
+  stiffness: 250,
+  mass: 1,
 };
 
 const SCALE_PRESSED = 0.9;

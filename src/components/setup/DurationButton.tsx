@@ -1,19 +1,21 @@
 /**
  * DurationButton - Animated button for timer duration selection
  * Part of GH-019: Refactor large components
+ * Updated in GH-021: Improved to use non-bouncy timing animation
  */
 
-import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import React, { useCallback } from "react";
+import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { useTheme } from "../../components/providers/ThemeProvider";
 import { typography } from "../../lib/theme";
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface DurationButtonProps {
   readonly duration: number;
@@ -21,55 +23,80 @@ interface DurationButtonProps {
   readonly onPress: () => void;
 }
 
+// Smooth, non-bouncy animation config
+const PRESS_IN_CONFIG = {
+  duration: 80,
+  easing: Easing.out(Easing.quad),
+};
+
+const PRESS_OUT_CONFIG = {
+  duration: 120,
+  easing: Easing.out(Easing.quad),
+};
+
 export function DurationButton({
   duration,
   isSelected,
   onPress,
 }: DurationButtonProps) {
   const { theme } = useTheme();
-  const pressed = useSharedValue(0);
+  const scale = useSharedValue(1);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: withSpring(1 - pressed.value * 0.05) }],
-    };
-  });
+  const handlePressIn = useCallback(() => {
+    scale.value = withTiming(0.95, PRESS_IN_CONFIG);
+  }, [scale]);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withTiming(1, PRESS_OUT_CONFIG);
+  }, [scale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <AnimatedTouchable
+    <AnimatedPressable
       onPress={onPress}
-      onPressIn={() => (pressed.value = 1)}
-      onPressOut={() => (pressed.value = 0)}
-      activeOpacity={1}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={[
+        styles.button,
         {
-          flex: 1,
-          minWidth: "30%",
-          paddingVertical: 16,
-          paddingHorizontal: 12,
-          borderRadius: 12,
-          borderWidth: 2,
           borderColor: isSelected ? theme.colors.primary : theme.colors.border,
           backgroundColor: isSelected
             ? `${theme.colors.primary}15`
             : theme.colors.surface,
-          alignItems: "center",
-          marginRight: 8,
-          marginBottom: 8,
         },
         animatedStyle,
       ]}
     >
       <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "600",
-          fontFamily: typography.fonts.semiBold,
-          color: isSelected ? theme.colors.primary : theme.colors.text,
-        }}
+        style={[
+          styles.text,
+          { color: isSelected ? theme.colors.primary : theme.colors.text },
+        ]}
       >
         {duration}s
       </Text>
-    </AnimatedTouchable>
+    </AnimatedPressable>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    flex: 1,
+    minWidth: "30%",
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: "center",
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: "600",
+    fontFamily: typography.fonts.semiBold,
+  },
+});

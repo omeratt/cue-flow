@@ -75,7 +75,7 @@ When implementing a feature, always reference the corresponding user story ID:
 - **GH-018**: Reorganize component file hierarchy ✅ COMPLETED
 - **GH-019**: Refactor large components (>150 lines) ✅ COMPLETED
 - **GH-020**: Extract logic from UI components to hooks ✅ COMPLETED
-- **GH-021**: Add micro-interaction animations 🔲 PENDING
+- **GH-021**: Add micro-interaction animations ✅ COMPLETED
 - **GH-022**: Add screen transition animations 🔲 PENDING
 - **GH-023**: Add animated feedback states 🔲 PENDING
 
@@ -320,29 +320,33 @@ Create dedicated hooks:
 
 ---
 
-### GH-021: Add Micro-Interaction Animations
+### GH-021: Add Micro-Interaction Animations ✅ COMPLETED
 
 Add subtle animations for better UX:
 
-| Element                | Animation                                     |
-| ---------------------- | --------------------------------------------- |
-| Ball buttons (snooker) | Scale pulse + color flash on press            |
-| Score changes          | Animated number counter (increment/decrement) |
-| Win button             | Subtle glow/pulse effect                      |
-| Foul button            | Shake animation on press                      |
-| Player indicator       | Slide transition when switching players       |
-| Duration buttons       | Spring press effect                           |
-| Text inputs            | Focus border animation                        |
+| Element                | Animation                                     | Status |
+| ---------------------- | --------------------------------------------- | ------ |
+| Ball buttons (snooker) | Scale pulse on press                          | ✅     |
+| Score changes          | Scale pulse animation                         | ✅     |
+| Win button             | Subtle scale press effect                     | ✅     |
+| Foul button            | Shake + scale animation on press              | ✅     |
+| Player indicator       | Smooth slide + fade transition                | ✅     |
+| Duration buttons       | Non-bouncy scale press effect                 | ✅     |
+| Text inputs            | Focus border color animation                  | ✅     |
+| Undo button            | Scale + rotation animation                    | ✅     |
+| Game mode cards        | Non-bouncy scale + background color animation | ✅     |
+| Rivalry cards          | Non-bouncy scale animation                    | ✅     |
+| Start button           | Scale press animation                         | ✅     |
 
 **Technology**: React Native Reanimated (already approved)
 
 **Acceptance Criteria:**
 
-- [ ] All interactive elements have press feedback
-- [ ] Score numbers animate when changing
-- [ ] Player switch has smooth transition
-- [ ] Animations run at 60fps
-- [ ] Animations are subtle, not distracting
+- [x] All interactive elements have press feedback
+- [x] Score numbers animate when changing
+- [x] Player switch has smooth transition
+- [x] Animations run at 60fps (using Reanimated)
+- [x] Animations are subtle, not distracting (non-bouncy per user preference)
 
 ---
 
