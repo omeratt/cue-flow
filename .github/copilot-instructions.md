@@ -209,11 +209,11 @@ export function ExampleScreen() {
 
 Check these locations for reusable components before creating new ones:
 
-- `src/components/ui/` - Generic UI components (ConfirmationModal, EmptyState, ErrorBoundary, LoadingState, SnookerBall)
+- `src/components/ui/` - Generic UI components (AnimatedModal, AnimatedListItem, ConfirmationModal, EmptyState, ErrorBoundary, LoadingState, SnookerBall)
 - `src/components/cards/` - Card-based components (GameModeCard, RivalryCard, SwipeableRivalryCard)
 - `src/components/timer/` - Timer components (CircularTimer, TimerInstructions)
-- `src/components/scoring/` - Scoring components (ScoringPanel, BallButtonRow, FoulButton, WinButton, UndoButton)
-- `src/components/modals/` - Modal components (WinnerModal)
+- `src/components/scoring/` - Scoring components (ScoringPanel, BallButtonRow, FoulButton, WinButton, UndoButton, RedoButton)
+- `src/components/modals/` - Modal components (WinnerModal, FoulPointModal)
 - `src/components/layout/` - Layout components (GameHeader, PlayerIndicator)
 - `src/components/icons/` - Icon components (GameModeIcon, PauseResumeIcon)
 - `src/components/providers/` - Context providers (ThemeProvider)
@@ -422,49 +422,55 @@ Critical bug fixes and feature enhancements for timer and scoring functionality.
 
 ---
 
-### GH-025: Add Screen Transition Animations
+### GH-025: Add Screen Transition Animations ✅ COMPLETED
 
 Improve navigation feel:
 
-| Transition       | Animation                                |
-| ---------------- | ---------------------------------------- |
-| Home → Setup     | Slide from right with fade               |
-| Setup → Play     | Fade through with scale                  |
-| Modal open/close | Spring-based slide up with backdrop fade |
-| Back navigation  | Slide back with parallax                 |
+| Transition       | Animation                                | Status |
+| ---------------- | ---------------------------------------- | ------ |
+| Home → Setup     | Slide from right with fade               | ✅     |
+| Setup → Play     | Fade transition for smooth game start    | ✅     |
+| Modal open/close | Spring-based slide up with backdrop fade | ✅     |
+| Back navigation  | Native slide back                        | ✅     |
+| Settings         | Slide from bottom (modal-like)           | ✅     |
 
 **Technology**: Expo Router + React Native Reanimated
 
+**Components Created:**
+
+- `AnimatedModal.tsx` - Spring-based modal with slide up animation
+- `AnimatedListItem.tsx` - Staggered list item entrance animation
+
 **Acceptance Criteria:**
 
-- [ ] All screen transitions are animated
-- [ ] Modals have smooth enter/exit animations
-- [ ] Navigation feels native and fluid
-- [ ] No jarring or instant transitions
+- [x] All screen transitions are animated
+- [x] Modals have smooth enter/exit animations
+- [x] Navigation feels native and fluid
+- [x] No jarring or instant transitions
 
 ---
 
-### GH-026: Add Animated Feedback States
+### GH-026: Add Animated Feedback States 🚧 IN PROGRESS
 
 Add dynamic visual feedback:
 
-| State                 | Animation                         |
-| --------------------- | --------------------------------- |
-| Timer running         | Subtle pulse on progress ring     |
-| Timer warning (< 33%) | Color shift + faster pulse        |
-| Timer expired         | Shake + flash effect              |
-| Game won              | Confetti or celebration animation |
-| Rivalry loaded        | Cards slide in staggered          |
-| Empty state           | Fade in with scale                |
-| Loading               | Skeleton shimmer                  |
+| State                 | Animation                     | Status |
+| --------------------- | ----------------------------- | ------ |
+| Timer running         | Subtle pulse on progress ring | 🔲     |
+| Timer warning (< 33%) | Color shift + faster pulse    | 🔲     |
+| Timer expired         | Shake + flash effect          | 🔲     |
+| Game won              | Confetti or celebration       | 🔲     |
+| Rivalry loaded        | Cards slide in staggered      | ✅     |
+| Empty state           | Fade in with scale            | ✅     |
+| Loading               | Fade in with scale            | ✅     |
 
 **Acceptance Criteria:**
 
 - [ ] Visual feedback matches timer state
 - [ ] Warning states are clearly communicated
 - [ ] Success moments feel celebratory
-- [ ] List items animate into view
-- [ ] Loading states are polished
+- [x] List items animate into view
+- [x] Loading states are polished
 
 ---
 

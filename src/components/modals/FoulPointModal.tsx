@@ -1,21 +1,16 @@
 /**
  * FoulPointModal - Modal for selecting foul point values
  * Extracted from FoulButton as part of GH-019
+ * Enhanced in GH-025: Spring-based modal animation
  */
 
 import React from "react";
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import type { FoulValue } from "../../lib/constants/game";
 import { SNOOKER_FOUL_VALUES } from "../../lib/constants/game";
 import { typography } from "../../lib/theme";
+import { AnimatedModal } from "../ui/AnimatedModal";
 
 interface FoulPointModalColors {
   modalSurface: string;
@@ -38,82 +33,59 @@ export function FoulPointModal({
   colors,
 }: FoulPointModalProps) {
   return (
-    <Modal
+    <AnimatedModal
       visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onCancel}
+      onClose={onCancel}
+      backgroundColor={colors.modalSurface}
+      backdropOpacity={0.6}
     >
-      <Pressable style={styles.overlay} onPress={onCancel}>
-        <Pressable
-          style={[styles.content, { backgroundColor: colors.modalSurface }]}
-          onPress={(e) => e.stopPropagation()}
-          accessibilityLabel="Foul point selection"
-          accessibilityRole="menu"
-        >
-          <Text style={[styles.title, { color: colors.modalText }]}>
-            Select Foul Points
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.modalTextSecondary }]}>
-            Points will be awarded to opponent
-          </Text>
+      <Text style={[styles.title, { color: colors.modalText }]}>
+        Select Foul Points
+      </Text>
+      <Text style={[styles.subtitle, { color: colors.modalTextSecondary }]}>
+        Points will be awarded to opponent
+      </Text>
 
-          <View style={styles.optionsContainer}>
-            {SNOOKER_FOUL_VALUES.map((points) => (
-              <TouchableOpacity
-                key={points}
-                style={[styles.option, { backgroundColor: colors.error }]}
-                onPress={() => onSelectFoul(points)}
-                activeOpacity={0.7}
-                accessibilityLabel={`${points} points foul`}
-                accessibilityRole="button"
-                accessibilityHint={`Award ${points} points to opponent`}
-              >
-                <Text style={styles.optionText}>{points}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
+      <View style={styles.optionsContainer}>
+        {SNOOKER_FOUL_VALUES.map((points) => (
           <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              { borderColor: colors.modalTextSecondary },
-            ]}
-            onPress={onCancel}
+            key={points}
+            style={[styles.option, { backgroundColor: colors.error }]}
+            onPress={() => onSelectFoul(points)}
             activeOpacity={0.7}
-            accessibilityLabel="Cancel"
+            accessibilityLabel={`${points} points foul`}
             accessibilityRole="button"
+            accessibilityHint={`Award ${points} points to opponent`}
           >
-            <Text
-              style={[
-                styles.cancelButtonText,
-                { color: colors.modalTextSecondary },
-              ]}
-            >
-              Cancel
-            </Text>
+            <Text style={styles.optionText}>{points}</Text>
           </TouchableOpacity>
-        </Pressable>
-      </Pressable>
-    </Modal>
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.cancelButton,
+          { borderColor: colors.modalTextSecondary },
+        ]}
+        onPress={onCancel}
+        activeOpacity={0.7}
+        accessibilityLabel="Cancel"
+        accessibilityRole="button"
+      >
+        <Text
+          style={[
+            styles.cancelButtonText,
+            { color: colors.modalTextSecondary },
+          ]}
+        >
+          Cancel
+        </Text>
+      </TouchableOpacity>
+    </AnimatedModal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  content: {
-    width: "100%",
-    maxWidth: 320,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-  },
   title: {
     fontSize: 20,
     fontWeight: "700",

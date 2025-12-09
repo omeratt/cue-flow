@@ -2,6 +2,7 @@
  * WinnerModal - Modal for marking game/frame winner
  * Implements GH-008: Mark game winner
  * Refactored in GH-019: Split into sub-components
+ * Enhanced in GH-025: Spring-based modal animation
  *
  * Acceptance Criteria:
  * - Two buttons to mark Player 1 or Player 2 as winner
@@ -12,9 +13,9 @@
  */
 
 import React from "react";
-import { Modal, Pressable, StyleSheet } from "react-native";
 
 import { useWinnerModal } from "../../hooks/useWinnerModal";
+import { AnimatedModal } from "../ui/AnimatedModal";
 import { WinnerConfirmationView } from "./WinnerConfirmationView";
 import { WinnerSelectionView } from "./WinnerSelectionView";
 
@@ -65,59 +66,32 @@ export function WinnerModal({
   const winnerName = selectedWinner === "player1" ? player1Name : player2Name;
 
   return (
-    <Modal
+    <AnimatedModal
       visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={handleClose}
+      onClose={handleClose}
+      backgroundColor={colors.modalSurface}
+      backdropOpacity={0.6}
     >
-      <Pressable style={styles.modalOverlay} onPress={handleClose}>
-        <Pressable
-          style={[
-            styles.modalContent,
-            { backgroundColor: colors.modalSurface },
-          ]}
-          onPress={(e) => e.stopPropagation()}
-        >
-          {showConfirmation ? (
-            <WinnerConfirmationView
-              winnerName={winnerName}
-              frameLabel={frameLabel}
-              colors={colors}
-              onConfirm={handleConfirm}
-              onCancel={handleCancel}
-            />
-          ) : (
-            <WinnerSelectionView
-              player1Name={player1Name}
-              player2Name={player2Name}
-              player1Score={player1Score}
-              player2Score={player2Score}
-              frameLabel={frameLabel}
-              colors={colors}
-              onSelectPlayer={handleSelectPlayer}
-              onClose={handleClose}
-            />
-          )}
-        </Pressable>
-      </Pressable>
-    </Modal>
+      {showConfirmation ? (
+        <WinnerConfirmationView
+          winnerName={winnerName}
+          frameLabel={frameLabel}
+          colors={colors}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
+      ) : (
+        <WinnerSelectionView
+          player1Name={player1Name}
+          player2Name={player2Name}
+          player1Score={player1Score}
+          player2Score={player2Score}
+          frameLabel={frameLabel}
+          colors={colors}
+          onSelectPlayer={handleSelectPlayer}
+          onClose={handleClose}
+        />
+      )}
+    </AnimatedModal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalContent: {
-    width: "100%",
-    maxWidth: 340,
-    borderRadius: 20,
-    padding: 24,
-    alignItems: "center",
-  },
-});

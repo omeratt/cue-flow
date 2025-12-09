@@ -1,6 +1,7 @@
 /**
  * RivalriesSection - Section displaying rivalry list or empty state
  * Extracted from HomeScreen as part of GH-019
+ * Enhanced in GH-025: Staggered list animation
  */
 
 import React from "react";
@@ -10,6 +11,7 @@ import { typography } from "../../lib/theme";
 import type { Rivalry } from "../../types/rivalry";
 import { SwipeableRivalryCard } from "../cards/SwipeableRivalryCard";
 import { useTheme } from "../providers/ThemeProvider";
+import { AnimatedListItem } from "../ui/AnimatedListItem";
 import { EmptyState } from "../ui/EmptyState";
 
 interface RivalriesSectionProps {
@@ -31,13 +33,14 @@ export function RivalriesSection({
         Your Rivalries
       </Text>
       {rivalries.length > 0 ? (
-        rivalries.map((rivalry) => (
-          <SwipeableRivalryCard
-            key={rivalry.id}
-            rivalry={rivalry}
-            onPress={onRivalryPress}
-            onDelete={onDeleteRequest}
-          />
+        rivalries.map((rivalry, index) => (
+          <AnimatedListItem key={rivalry.id} index={index}>
+            <SwipeableRivalryCard
+              rivalry={rivalry}
+              onPress={onRivalryPress}
+              onDelete={onDeleteRequest}
+            />
+          </AnimatedListItem>
         ))
       ) : (
         <EmptyState

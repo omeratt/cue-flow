@@ -65,8 +65,30 @@ function RootLayoutNav() {
           headerShown: false,
           contentStyle: { backgroundColor: theme.colors.background },
           animation: "slide_from_right",
+          animationDuration: 300,
         }}
-      />
+      >
+        {/* Home screen - default entry point */}
+        <Stack.Screen name="index" options={{ animation: "fade" }} />
+        {/* Settings - slide up as modal-like experience */}
+        <Stack.Screen
+          name="settings"
+          options={{
+            animation: "slide_from_bottom",
+            animationDuration: 350,
+            gestureDirection: "vertical",
+            gestureEnabled: true,
+          }}
+        />
+        {/* Game routes - slide from right with smooth transition */}
+        <Stack.Screen
+          name="game"
+          options={{
+            animation: "slide_from_right",
+            animationDuration: 300,
+          }}
+        />
+      </Stack>
     </>
   );
 }

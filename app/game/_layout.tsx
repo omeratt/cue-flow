@@ -1,5 +1,6 @@
 /**
  * Game routes layout
+ * GH-025: Screen transition animations
  */
 
 import { Stack } from "expo-router";
@@ -13,8 +14,24 @@ export default function GameLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: theme.colors.background },
-        animation: "slide_from_right",
       }}
-    />
+    >
+      {/* Setup screen - slide from right */}
+      <Stack.Screen
+        name="setup"
+        options={{
+          animation: "slide_from_right",
+          animationDuration: 300,
+        }}
+      />
+      {/* Play screen - fade transition for smooth game start feel */}
+      <Stack.Screen
+        name="play"
+        options={{
+          animation: "fade",
+          animationDuration: 400,
+        }}
+      />
+    </Stack>
   );
 }

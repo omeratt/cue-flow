@@ -1,28 +1,58 @@
 /**
  * EmptyState - Shown when there are no rivalries yet
+ * Enhanced in GH-025: Fade in with scale animation
  */
 
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, Text } from "react-native";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+
 import { typography } from "../../lib/theme";
 import { useTheme } from "../providers/ThemeProvider";
 
+// Spring configuration for smooth entrance
+const SPRING_CONFIG = {
+  damping: 16,
+  stiffness: 180,
+  mass: 0.8,
+};
+
 interface EmptyStateProps {
-  icon?: string;
-  title: string;
-  message: string;
+  readonly icon?: string;
+  readonly title: string;
+  readonly message: string;
 }
 
 export function EmptyState({ icon = "🎱", title, message }: EmptyStateProps) {
   const { theme } = useTheme();
   const styles = createStyles(theme.colors);
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withSpring(1, SPRING_CONFIG);
+  }, [progress]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = interpolate(progress.value, [0, 1], [0.85, 1]);
+    const opacity = interpolate(progress.value, [0, 0.5, 1], [0, 0.3, 1]);
+
+    return {
+      opacity,
+      transform: [{ scale }],
+    };
+  });
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, animatedStyle]}>
       <Text style={styles.icon}>{icon}</Text>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-    </View>
+    </Animated.View>
   );
 }
 
