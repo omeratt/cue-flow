@@ -1,6 +1,7 @@
 /**
  * ConfirmationModal - A reusable confirmation dialog component
  * Used for destructive actions like deleting rivalries (GH-013)
+ * Refactored in GH-019: Condensed styles
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -14,6 +15,7 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
+
 import { typography } from "../../lib/theme";
 import { useTheme } from "../providers/ThemeProvider";
 
@@ -41,7 +43,7 @@ export function ConfirmationModal({
   onCancel,
 }: ConfirmationModalProps) {
   const { theme } = useTheme();
-  const styles = createStyles(theme.colors, isDestructive);
+  const { colors } = theme;
 
   return (
     <Modal
@@ -53,14 +55,17 @@ export function ConfirmationModal({
     >
       <AnimatedPressable style={styles.backdrop} onPress={onCancel}>
         <Animated.View style={styles.container}>
-          {/* Prevent backdrop press from closing when tapping content */}
           <Pressable onPress={(e) => e.stopPropagation()}>
-            <View style={styles.content}>
+            <View style={[styles.content, { backgroundColor: colors.surface }]}>
               {/* Icon */}
               <View
                 style={[
                   styles.iconContainer,
-                  isDestructive && styles.iconContainerDestructive,
+                  {
+                    backgroundColor: `${
+                      isDestructive ? colors.error : colors.primary
+                    }15`,
+                  },
                 ]}
               >
                 <Ionicons
@@ -68,37 +73,44 @@ export function ConfirmationModal({
                     isDestructive ? "warning-outline" : "help-circle-outline"
                   }
                   size={32}
-                  color={
-                    isDestructive ? theme.colors.error : theme.colors.primary
-                  }
+                  color={isDestructive ? colors.error : colors.primary}
                 />
               </View>
 
-              {/* Title */}
-              <Text style={styles.title}>{title}</Text>
-
-              {/* Message */}
-              <Text style={styles.message}>{message}</Text>
+              {/* Title & Message */}
+              <Text style={[styles.title, { color: colors.text }]}>
+                {title}
+              </Text>
+              <Text style={[styles.message, { color: colors.textSecondary }]}>
+                {message}
+              </Text>
 
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity
-                  style={styles.cancelButton}
+                  style={[styles.button, { backgroundColor: colors.divider }]}
                   onPress={onCancel}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.cancelButtonText}>{cancelLabel}</Text>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>
+                    {cancelLabel}
+                  </Text>
                 </TouchableOpacity>
-
                 <TouchableOpacity
                   style={[
-                    styles.confirmButton,
-                    isDestructive && styles.confirmButtonDestructive,
+                    styles.button,
+                    {
+                      backgroundColor: isDestructive
+                        ? colors.error
+                        : colors.primary,
+                    },
                   ]}
                   onPress={onConfirm}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+                  <Text style={[styles.buttonText, { color: "#FFFFFF" }]}>
+                    {confirmLabel}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -109,88 +121,48 @@ export function ConfirmationModal({
   );
 }
 
-const createStyles = (
-  colors: ReturnType<typeof useTheme>["theme"]["colors"],
-  isDestructive: boolean
-) =>
-  StyleSheet.create({
-    backdrop: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 24,
-    },
-    container: {
-      width: "100%",
-      maxWidth: 340,
-    },
-    content: {
-      backgroundColor: colors.surface,
-      borderRadius: 20,
-      padding: 24,
-      alignItems: "center",
-    },
-    iconContainer: {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
-      backgroundColor: `${colors.primary}15`,
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: 16,
-    },
-    iconContainerDestructive: {
-      backgroundColor: `${colors.error}15`,
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: "700",
-      fontFamily: typography.fonts.bold,
-      color: colors.text,
-      textAlign: "center",
-      marginBottom: 8,
-    },
-    message: {
-      fontSize: 15,
-      fontFamily: typography.fonts.regular,
-      color: colors.textSecondary,
-      textAlign: "center",
-      lineHeight: 22,
-      marginBottom: 24,
-    },
-    actions: {
-      flexDirection: "row",
-      gap: 12,
-      width: "100%",
-    },
-    cancelButton: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: 12,
-      backgroundColor: colors.divider,
-      alignItems: "center",
-    },
-    cancelButtonText: {
-      fontSize: 16,
-      fontWeight: "600",
-      fontFamily: typography.fonts.semiBold,
-      color: colors.text,
-    },
-    confirmButton: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: 12,
-      backgroundColor: colors.primary,
-      alignItems: "center",
-    },
-    confirmButtonDestructive: {
-      backgroundColor: colors.error,
-    },
-    confirmButtonText: {
-      fontSize: 16,
-      fontWeight: "600",
-      fontFamily: typography.fonts.semiBold,
-      color: "#FFFFFF",
-    },
-  });
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  container: { width: "100%", maxWidth: 340 },
+  content: { borderRadius: 20, padding: 24, alignItems: "center" },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+    fontFamily: typography.fonts.bold,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 15,
+    fontFamily: typography.fonts.regular,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  actions: { flexDirection: "row", gap: 12, width: "100%" },
+  button: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    fontFamily: typography.fonts.semiBold,
+  },
+});

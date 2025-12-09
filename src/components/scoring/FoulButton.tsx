@@ -1,33 +1,19 @@
 /**
  * FoulButton - Button for recording snooker fouls with point selection
  * Implements GH-010: Handle snooker fouls
- *
- * Acceptance Criteria:
- * - Foul button opens point selection (4, 5, 6, 7)
- * - Selected foul points added to opponent's score
- * - Foul is recorded/indicated in current frame
- * - Turn switches to opponent after foul
+ * Refactored in GH-019: Extracted modal to FoulPointModal
  */
 
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useState } from "react";
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import type { FoulValue } from "../../lib/constants/game";
-import { SNOOKER_FOUL_VALUES } from "../../lib/constants/game";
 import { typography } from "../../lib/theme";
+import { FoulPointModal } from "../modals/FoulPointModal";
 
 interface FoulButtonColors {
-  buttonBackground: string;
   buttonText: string;
-  modalBackground: string;
   modalSurface: string;
   modalText: string;
   modalTextSecondary: string;
@@ -93,74 +79,12 @@ export function FoulButton({
         </Text>
       </TouchableOpacity>
 
-      <Modal
+      <FoulPointModal
         visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={handleCancel}
-      >
-        <Pressable style={styles.modalOverlay} onPress={handleCancel}>
-          <Pressable
-            style={[
-              styles.modalContent,
-              { backgroundColor: colors.modalSurface },
-            ]}
-            onPress={(e) => e.stopPropagation()}
-            accessibilityLabel="Foul point selection"
-            accessibilityRole="menu"
-          >
-            <Text style={[styles.modalTitle, { color: colors.modalText }]}>
-              Select Foul Points
-            </Text>
-            <Text
-              style={[
-                styles.modalSubtitle,
-                { color: colors.modalTextSecondary },
-              ]}
-            >
-              Points will be awarded to opponent
-            </Text>
-
-            <View style={styles.foulOptionsContainer}>
-              {SNOOKER_FOUL_VALUES.map((points) => (
-                <TouchableOpacity
-                  key={points}
-                  style={[styles.foulOption, { backgroundColor: colors.error }]}
-                  onPress={() => handleSelectFoul(points)}
-                  activeOpacity={0.7}
-                  accessibilityLabel={`${points} points foul`}
-                  accessibilityRole="button"
-                  accessibilityHint={`Award ${points} points to opponent`}
-                >
-                  <Text style={[styles.foulOptionText, { color: "#ffffff" }]}>
-                    {points}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.cancelButton,
-                { borderColor: colors.modalTextSecondary },
-              ]}
-              onPress={handleCancel}
-              activeOpacity={0.7}
-              accessibilityLabel="Cancel"
-              accessibilityRole="button"
-            >
-              <Text
-                style={[
-                  styles.cancelButtonText,
-                  { color: colors.modalTextSecondary },
-                ]}
-              >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        onSelectFoul={handleSelectFoul}
+        onCancel={handleCancel}
+        colors={colors}
+      />
     </>
   );
 }
@@ -172,77 +96,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     minWidth: 85,
     alignItems: "center",
-    // Premium shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 4,
   },
-  disabled: {
-    opacity: 0.4,
-  },
+  disabled: { opacity: 0.4 },
   foulButtonText: {
     fontSize: 13,
     fontWeight: "700",
     fontFamily: typography.fonts.bold,
     letterSpacing: 1.5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalContent: {
-    width: "100%",
-    maxWidth: 320,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    fontFamily: typography.fonts.bold,
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    fontFamily: typography.fonts.regular,
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  foulOptionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 24,
-    gap: 12,
-  },
-  foulOption: {
-    flex: 1,
-    aspectRatio: 1,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    maxWidth: 64,
-  },
-  foulOptionText: {
-    fontSize: 24,
-    fontWeight: "700",
-    fontFamily: typography.fonts.bold,
-  },
-  cancelButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: typography.fonts.semiBold,
   },
 });

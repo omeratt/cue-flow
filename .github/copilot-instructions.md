@@ -73,8 +73,8 @@ When implementing a feature, always reference the corresponding user story ID:
 ### Phase 6: Code Quality & Architecture (GH-018 to GH-023)
 
 - **GH-018**: Reorganize component file hierarchy ✅ COMPLETED
-- **GH-019**: Refactor large components (>150 lines) 🔲 PENDING
-- **GH-020**: Extract logic from UI components to hooks 🔲 PENDING
+- **GH-019**: Refactor large components (>150 lines) ✅ COMPLETED
+- **GH-020**: Extract logic from UI components to hooks ✅ COMPLETED
 - **GH-021**: Add micro-interaction animations 🔲 PENDING
 - **GH-022**: Add screen transition animations 🔲 PENDING
 - **GH-023**: Add animated feedback states 🔲 PENDING
@@ -291,14 +291,14 @@ Components to split:
 
 **Acceptance Criteria:**
 
-- [ ] No component file exceeds 150 lines (screens can be up to 200)
-- [ ] Logic extracted to custom hooks
-- [ ] Sub-components are reusable and testable
-- [ ] Code is more readable and maintainable
+- [x] No component file exceeds 150 lines (screens can be up to 200)
+- [x] Logic extracted to custom hooks
+- [x] Sub-components are reusable and testable
+- [x] Code is more readable and maintainable
 
 ---
 
-### GH-020: Extract Logic from UI Components to Hooks
+### GH-020: Extract Logic from UI Components to Hooks ✅ COMPLETED
 
 Create dedicated hooks:
 
@@ -308,13 +308,15 @@ Create dedicated hooks:
 | `useGameSetup.ts`              | GameSetupScreen | Form state, validation, duration selection logic         |
 | `useWinnerModal.ts`            | WinnerModal     | Selection state, confirmation flow, haptic feedback      |
 | `useRivalryCard.ts`            | RivalryCard     | Press animation, date formatting                         |
+| `useSettings.ts`               | SettingsScreen  | Theme selection, toggles, clear data handlers            |
+| `useHome.ts`                   | HomeScreen      | Rivalry management, game mode selection, navigation      |
 
 **Acceptance Criteria:**
 
-- [ ] UI components are pure/presentational (only render + styles)
-- [ ] All business logic lives in hooks
-- [ ] Hooks are testable in isolation
-- [ ] Components receive data and callbacks via props
+- [x] UI components are pure/presentational (only render + styles)
+- [x] All business logic lives in hooks
+- [x] Hooks are testable in isolation
+- [x] Components receive data and callbacks via props
 
 ---
 

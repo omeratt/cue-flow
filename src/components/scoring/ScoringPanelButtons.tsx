@@ -70,9 +70,7 @@ export function ScoringPanelButtons({
         <FoulButton
           onFoul={onFoul}
           colors={{
-            buttonBackground: colors.buttonBackground,
             buttonText: colors.buttonText,
-            modalBackground: "rgba(0, 0, 0, 0.6)",
             modalSurface: colors.surface,
             modalText: colors.text,
             modalTextSecondary: colors.textSecondary,

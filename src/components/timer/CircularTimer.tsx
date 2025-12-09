@@ -1,6 +1,7 @@
 /**
  * CircularTimer - Animated circular timer display
  * Implements GH-005: View animated countdown
+ * Refactored in GH-019: Extract animation logic to hook
  *
  * Features:
  * - Circular progress ring that depletes as time passes
@@ -10,28 +11,19 @@
  * - Press animation with haptic feedback
  */
 
-import * as Haptics from "expo-haptics";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   createAnimatedComponent,
-  interpolateColor,
   SharedValue,
-  useAnimatedProps,
-  useAnimatedReaction,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withSpring,
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
-import { scheduleOnRN } from "react-native-worklets";
 
+import { useCircularTimerAnimation } from "../../hooks/useCircularTimerAnimation";
 import type { TimerState } from "../../hooks/useGameTimer";
 import { typography } from "../../lib/theme";
 import { useTheme } from "../providers/ThemeProvider";
 
-// Create animated Circle component
 const AnimatedCircle = createAnimatedComponent(Circle);
 
 interface CircularTimerProps {
@@ -54,131 +46,36 @@ export function CircularTimer({
   hapticEnabled = true,
 }: Readonly<CircularTimerProps>) {
   const { theme } = useTheme();
-
-  // React state for text display (updated from UI thread)
-  const [displaySeconds, setDisplaySeconds] = useState(0);
-  const [currentTimerState, setCurrentTimerState] =
-    useState<TimerState>("idle");
-
-  // Scale animation for press feedback
-  const scale = useSharedValue(1);
-
-  // Calculate circle dimensions
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
-  // Ref to store timeout for haptic feedback
-  const hapticTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Press handlers for animation
-  const handlePressIn = useCallback(() => {
-    if (hapticEnabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-
-    scale.value = withSpring(0.95, {
-      damping: 25,
-      stiffness: 400,
-    });
-  }, [hapticEnabled, scale]);
-
-  const handlePressOut = useCallback(() => {
-    if (hapticEnabled) {
-      // Clear any existing timer
-      if (hapticTimerRef.current) {
-        clearTimeout(hapticTimerRef.current);
-      }
-
-      hapticTimerRef.current = setTimeout(() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
-        hapticTimerRef.current = null;
-      }, 90);
-    }
-
-    scale.value = withSpring(1, {
-      damping: 25,
-      stiffness: 300,
-    });
-  }, [hapticEnabled, scale]);
-
-  const handlePress = useCallback(() => {
-    onPress?.();
-  }, [onPress]);
-
-  // Sync timer state to React state for text display
-  useAnimatedReaction(
-    () => timerState.value,
-    (newState) => {
-      scheduleOnRN(setCurrentTimerState, newState);
-    },
-    []
-  );
-
-  // Sync display seconds to React state
-  useAnimatedReaction(
-    () => Math.ceil(remainingTime.value / 1000),
-    (newSeconds) => {
-      scheduleOnRN(setDisplaySeconds, newSeconds);
-    },
-    []
-  );
-
-  // Derive the color based on progress
-  const timerActive = theme.colors.timerActive;
-  const timerWarning = theme.colors.timerWarning;
-  const timerDanger = theme.colors.timerDanger;
-
-  const progressColor = useDerivedValue(() => {
-    return interpolateColor(
-      progress.value,
-      [0, 0.33, 0.66, 1],
-      [timerDanger, timerDanger, timerWarning, timerActive]
-    );
+  const {
+    displaySeconds,
+    currentTimerState,
+    animatedCircleProps,
+    animatedTextStyle,
+    containerStyle,
+    pressAnimatedStyle,
+    handlePressIn,
+    handlePressOut,
+  } = useCircularTimerAnimation({
+    progress,
+    remainingTime,
+    timerState,
+    circumference,
+    colors: theme.colors,
+    hapticEnabled,
   });
 
-  // Animated props for the progress circle
-  const animatedCircleProps = useAnimatedProps(() => {
-    const strokeDashoffset = circumference * (1 - progress.value);
+  const handlePress = useCallback(() => onPress?.(), [onPress]);
 
-    return {
-      strokeDashoffset,
-      stroke: progressColor.value,
-    };
-  });
-
-  // Animated style for the seconds text color
-  const animatedTextStyle = useAnimatedStyle(() => {
-    return {
-      color: progressColor.value,
-    };
-  });
-
-  // Animated style for opacity based on timer state
-  const containerStyle = useAnimatedStyle(() => {
-    const isIdle = timerState.value === "idle";
-    return {
-      opacity: isIdle ? 0.7 : 1,
-    };
-  });
-
-  // Animated style for press scale
-  const pressAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  // Get display text based on timer state
   const getDisplayText = (): string => {
-    if (currentTimerState === "idle") {
-      return "TAP";
-    }
-    if (currentTimerState === "expired") {
-      return "0";
-    }
+    if (currentTimerState === "idle") return "TAP";
+    if (currentTimerState === "expired") return "0";
     return String(displaySeconds);
   };
 
-  // Get subtitle text based on timer state
   const getSubtitleText = (): string => {
     switch (currentTimerState) {
       case "idle":
@@ -197,7 +94,6 @@ export function CircularTimer({
       ? theme.colors.textSecondary
       : theme.colors.textMuted;
 
-  // Generate accessibility label based on timer state
   const getAccessibilityLabel = (): string => {
     switch (currentTimerState) {
       case "idle":
@@ -223,7 +119,6 @@ export function CircularTimer({
       ]}
     >
       <Svg width={size} height={size} style={styles.svg}>
-        {/* Background circle (track) */}
         <Circle
           cx={center}
           cy={center}
@@ -232,8 +127,6 @@ export function CircularTimer({
           strokeWidth={strokeWidth}
           fill="transparent"
         />
-
-        {/* Progress circle (animated) */}
         <AnimatedCircle
           cx={center}
           cy={center}
@@ -243,12 +136,9 @@ export function CircularTimer({
           strokeLinecap="round"
           strokeDasharray={circumference}
           animatedProps={animatedCircleProps}
-          // Rotate to start from top
           transform={`rotate(-90 ${center} ${center})`}
         />
       </Svg>
-
-      {/* Center content */}
       <View style={styles.centerContent}>
         <Animated.Text style={[styles.secondsText, animatedTextStyle]}>
           {getDisplayText()}
@@ -260,7 +150,6 @@ export function CircularTimer({
     </Animated.View>
   );
 
-  // If onPress is provided, wrap in Pressable
   if (onPress) {
     return (
       <Pressable
@@ -280,13 +169,8 @@ export function CircularTimer({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  svg: {
-    position: "absolute",
-  },
+  container: { justifyContent: "center", alignItems: "center" },
+  svg: { position: "absolute" },
   centerContent: {
     position: "absolute",
     justifyContent: "center",
