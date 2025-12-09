@@ -6,10 +6,12 @@
  */
 
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import type { useSharedValue } from "react-native-reanimated";
+import { useAnimatedReaction } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { scheduleOnRN } from "react-native-worklets";
 
 import type { TimerState } from "../../hooks/useGameTimer";
 import type { GameMode } from "../../lib/constants/game";
@@ -44,9 +46,27 @@ export function GameHeader({
 }: Readonly<GameHeaderProps>) {
   const insets = useSafeAreaInsets();
 
+  // Sync timer state to React state for accessibility label
+  const [currentTimerState, setCurrentTimerState] =
+    useState<TimerState>("idle");
+
+  useAnimatedReaction(
+    () => timerState.value,
+    (newState) => {
+      scheduleOnRN(setCurrentTimerState, newState);
+    },
+    []
+  );
+
   return (
     <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-      <TouchableOpacity onPress={onBack} style={styles.iconButton}>
+      <TouchableOpacity
+        onPress={onBack}
+        style={styles.iconButton}
+        accessibilityLabel="Close game"
+        accessibilityRole="button"
+        accessibilityHint="Returns to game setup"
+      >
         <Ionicons name="close" size={28} color={textColor} />
       </TouchableOpacity>
 
@@ -63,7 +83,13 @@ export function GameHeader({
 
       <View style={styles.headerRight}>
         {onToggleSound && (
-          <TouchableOpacity onPress={onToggleSound} style={styles.iconButton}>
+          <TouchableOpacity
+            onPress={onToggleSound}
+            style={styles.iconButton}
+            accessibilityLabel={soundEnabled ? "Mute sounds" : "Unmute sounds"}
+            accessibilityRole="button"
+            accessibilityState={{ selected: soundEnabled }}
+          >
             <Ionicons
               name={soundEnabled ? "volume-high" : "volume-mute"}
               size={24}
@@ -71,7 +97,12 @@ export function GameHeader({
             />
           </TouchableOpacity>
         )}
-        <TouchableOpacity onPress={onPauseResume} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={onPauseResume}
+          style={styles.iconButton}
+          accessibilityLabel={currentTimerState === "running" ? "Pause timer" : "Resume timer"}
+          accessibilityRole="button"
+        >
           <PauseResumeIcon timerState={timerState} color={textColor} />
         </TouchableOpacity>
       </View>

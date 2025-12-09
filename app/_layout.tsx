@@ -16,13 +16,27 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+
 import {
   ThemeProvider,
   useTheme,
 } from "../src/components/providers/ThemeProvider";
+import { ErrorBoundary } from "../src/components/ui/ErrorBoundary";
 import { persistor, store } from "../src/store";
+
+// Configure Reanimated logger to disable strict mode warnings
+// These warnings occur when reading SharedValue.value in callbacks,
+// which is intentional in our timer logic for checking state before actions
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -78,13 +92,15 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <Provider store={store}>
-        <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-          <ThemeProvider>
-            <RootLayoutNav />
-          </ThemeProvider>
-        </PersistGate>
-      </Provider>
+      <ErrorBoundary>
+        <Provider store={store}>
+          <PersistGate loading={<LoadingScreen />} persistor={persistor}>
+            <ThemeProvider>
+              <RootLayoutNav />
+            </ThemeProvider>
+          </PersistGate>
+        </Provider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

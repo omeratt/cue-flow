@@ -81,6 +81,9 @@ export function GameModeCard({ mode, onPress, style }: GameModeCardProps) {
       onPressOut={handlePressOut}
       activeOpacity={1}
       style={[styles.card, animatedStyle, style]}
+      accessibilityLabel={`${modeConfig.label} mode. ${modeConfig.description}`}
+      accessibilityRole="button"
+      accessibilityHint="Select this game mode to continue"
     >
       <View style={styles.iconContainer}>
         <GameModeIcon mode={mode} size="lg" />

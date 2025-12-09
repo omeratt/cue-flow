@@ -83,6 +83,10 @@ export function FoulButton({
         onPress={handleOpenModal}
         disabled={disabled}
         activeOpacity={0.7}
+        accessibilityLabel="Foul"
+        accessibilityRole="button"
+        accessibilityHint="Opens foul point selection. Points will be awarded to opponent"
+        accessibilityState={{ disabled }}
       >
         <Text style={[styles.foulButtonText, { color: colors.buttonText }]}>
           FOUL
@@ -102,6 +106,8 @@ export function FoulButton({
               { backgroundColor: colors.modalSurface },
             ]}
             onPress={(e) => e.stopPropagation()}
+            accessibilityLabel="Foul point selection"
+            accessibilityRole="menu"
           >
             <Text style={[styles.modalTitle, { color: colors.modalText }]}>
               Select Foul Points
@@ -122,6 +128,9 @@ export function FoulButton({
                   style={[styles.foulOption, { backgroundColor: colors.error }]}
                   onPress={() => handleSelectFoul(points)}
                   activeOpacity={0.7}
+                  accessibilityLabel={`${points} points foul`}
+                  accessibilityRole="button"
+                  accessibilityHint={`Award ${points} points to opponent`}
                 >
                   <Text style={[styles.foulOptionText, { color: "#ffffff" }]}>
                     {points}
@@ -137,6 +146,8 @@ export function FoulButton({
               ]}
               onPress={handleCancel}
               activeOpacity={0.7}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
             >
               <Text
                 style={[

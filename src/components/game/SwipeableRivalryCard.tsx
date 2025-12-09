@@ -1,10 +1,11 @@
 /**
  * SwipeableRivalryCard - A swipeable wrapper for RivalryCard with delete action
  * Implements GH-013: Delete rivalry (swipe-to-delete gesture)
+ * Memoized for performance when rendering in lists
  */
 
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useRef } from "react";
+import React, { memo, useCallback, useRef } from "react";
 import { StyleSheet, Text } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import ReanimatedSwipeable, {
@@ -62,7 +63,7 @@ function DeleteAction({
   );
 }
 
-export function SwipeableRivalryCard({
+function SwipeableRivalryCardComponent({
   rivalry,
   onPress,
   onDelete,
@@ -105,6 +106,9 @@ export function SwipeableRivalryCard({
     </ReanimatedSwipeable>
   );
 }
+
+// Memoize to prevent unnecessary re-renders in lists
+export const SwipeableRivalryCard = memo(SwipeableRivalryCardComponent);
 
 const styles = StyleSheet.create({
   swipeableContainer: {

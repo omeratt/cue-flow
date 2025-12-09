@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,6 +17,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import Animated, {
@@ -131,116 +133,118 @@ export function GameSetupScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-          <View style={styles.headerContent}>
-            {gameMode && <GameModeIcon mode={gameMode} size="md" />}
-            <Text style={styles.title}>{modeConfig?.label} Setup</Text>
-          </View>
-        </View>
-
-        {/* Active Rivalry Badge */}
-        {activeRivalry && (
-          <View style={styles.rivalryBadge}>
-            <Ionicons
-              name="trophy-outline"
-              size={16}
-              color={theme.colors.primary}
-            />
-            <Text style={styles.rivalryBadgeText}>
-              Continuing rivalry: {activeRivalry.wins.player1} -{" "}
-              {activeRivalry.wins.player2}
-            </Text>
-          </View>
-        )}
-
-        {/* Player Names Section - GH-002 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Players</Text>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Player 1</Text>
-            <TextInput
-              style={styles.input}
-              value={player1Name}
-              onChangeText={setPlayer1Name}
-              placeholder="Enter name"
-              placeholderTextColor={theme.colors.textMuted}
-              autoCapitalize="words"
-              returnKeyType="next"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Player 2</Text>
-            <TextInput
-              style={styles.input}
-              value={player2Name}
-              onChangeText={setPlayer2Name}
-              placeholder="Enter name"
-              placeholderTextColor={theme.colors.textMuted}
-              autoCapitalize="words"
-              returnKeyType="done"
-            />
-          </View>
-        </View>
-
-        {/* Timer Duration Section - GH-003 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Turn Duration</Text>
-
-          <View style={styles.durationGrid}>
-            {TIMER_PRESETS.map((duration) => (
-              <DurationButton
-                key={duration}
-                duration={duration}
-                isSelected={!isCustom && selectedDuration === duration}
-                onPress={() => handleDurationSelect(duration)}
-                colors={theme.colors}
-              />
-            ))}
-          </View>
-
-          <View style={styles.customDurationContainer}>
-            <Text style={styles.inputLabel}>Custom (seconds)</Text>
-            <TextInput
-              style={[styles.input, isCustom && styles.inputActive]}
-              value={customDuration}
-              onChangeText={handleCustomDurationChange}
-              placeholder="e.g. 25"
-              placeholderTextColor={theme.colors.textMuted}
-              keyboardType="number-pad"
-              returnKeyType="done"
-            />
-          </View>
-        </View>
-      </ScrollView>
-
-      {/* Start Button */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.startButton, !isValid && styles.startButtonDisabled]}
-          onPress={handleStartGame}
-          disabled={!isValid}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.startButtonText}>Start Game</Text>
-          <Ionicons name="play" size={20} color={theme.colors.buttonText} />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+            </TouchableOpacity>
+            <View style={styles.headerContent}>
+              {gameMode && <GameModeIcon mode={gameMode} size="md" />}
+              <Text style={styles.title}>{modeConfig?.label} Setup</Text>
+            </View>
+          </View>
+
+          {/* Active Rivalry Badge */}
+          {activeRivalry && (
+            <View style={styles.rivalryBadge}>
+              <Ionicons
+                name="trophy-outline"
+                size={16}
+                color={theme.colors.primary}
+              />
+              <Text style={styles.rivalryBadgeText}>
+                Continuing rivalry: {activeRivalry.wins.player1} -{" "}
+                {activeRivalry.wins.player2}
+              </Text>
+            </View>
+          )}
+
+          {/* Player Names Section - GH-002 */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Players</Text>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Player 1</Text>
+              <TextInput
+                style={styles.input}
+                value={player1Name}
+                onChangeText={setPlayer1Name}
+                placeholder="Enter name"
+                placeholderTextColor={theme.colors.textMuted}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Player 2</Text>
+              <TextInput
+                style={styles.input}
+                value={player2Name}
+                onChangeText={setPlayer2Name}
+                placeholder="Enter name"
+                placeholderTextColor={theme.colors.textMuted}
+                autoCapitalize="words"
+                returnKeyType="done"
+              />
+            </View>
+          </View>
+
+          {/* Timer Duration Section - GH-003 */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Turn Duration</Text>
+
+            <View style={styles.durationGrid}>
+              {TIMER_PRESETS.map((duration) => (
+                <DurationButton
+                  key={duration}
+                  duration={duration}
+                  isSelected={!isCustom && selectedDuration === duration}
+                  onPress={() => handleDurationSelect(duration)}
+                  colors={theme.colors}
+                />
+              ))}
+            </View>
+
+            <View style={styles.customDurationContainer}>
+              <Text style={styles.inputLabel}>Custom (seconds)</Text>
+              <TextInput
+                style={[styles.input, isCustom && styles.inputActive]}
+                value={customDuration}
+                onChangeText={handleCustomDurationChange}
+                placeholder="e.g. 25"
+                placeholderTextColor={theme.colors.textMuted}
+                keyboardType="number-pad"
+                returnKeyType="done"
+              />
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* Start Button */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[styles.startButton, !isValid && styles.startButtonDisabled]}
+            onPress={handleStartGame}
+            disabled={!isValid}
+          >
+            <Text style={styles.startButtonText}>Start Game</Text>
+            <Ionicons name="play" size={20} color={theme.colors.buttonText} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 

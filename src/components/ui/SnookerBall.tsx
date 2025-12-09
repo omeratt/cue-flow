@@ -77,9 +77,9 @@ interface SnookerBallProps {
 const generateDarkColor = (color: string): string => {
   // Simple darkening - reduce each RGB channel
   const hex = color.replace("#", "");
-  const r = Math.max(0, parseInt(hex.slice(0, 2), 16) - 40);
-  const g = Math.max(0, parseInt(hex.slice(2, 4), 16) - 40);
-  const b = Math.max(0, parseInt(hex.slice(4, 6), 16) - 40);
+  const r = Math.max(0, Number.parseInt(hex.slice(0, 2), 16) - 40);
+  const g = Math.max(0, Number.parseInt(hex.slice(2, 4), 16) - 40);
+  const b = Math.max(0, Number.parseInt(hex.slice(4, 6), 16) - 40);
   return `#${r.toString(16).padStart(2, "0")}${g
     .toString(16)
     .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
@@ -231,6 +231,21 @@ export function SnookerBall({
 
   if (isPressable) {
     const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+    // Generate accessibility label
+    let ballName = `${preset} ball`;
+    if (preset === "8ball") {
+      ballName = "8-ball";
+    } else if (preset === "cue") {
+      ballName = "cue ball";
+    }
+
+    let accessibilityLabel = ballName;
+    if (displayValue !== null) {
+      const pointsText = displayValue === 1 ? "point" : "points";
+      accessibilityLabel = `${ballName}, ${displayValue} ${pointsText}`;
+    }
+
     return (
       <AnimatedPressable
         style={[
@@ -244,6 +259,12 @@ export function SnookerBall({
         onPressOut={handlePressOut}
         onPress={handlePress}
         disabled={disabled}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole="button"
+        accessibilityHint={
+          disabled ? "Ball is disabled" : "Adds points to current player"
+        }
+        accessibilityState={{ disabled }}
       >
         {ballContent}
       </AnimatedPressable>
@@ -267,9 +288,9 @@ export function SnookerBall({
 // Helper to check if a color is light
 function isLightColor(color: string): boolean {
   const hex = color.replace("#", "");
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
+  const r = Number.parseInt(hex.slice(0, 2), 16);
+  const g = Number.parseInt(hex.slice(2, 4), 16);
+  const b = Number.parseInt(hex.slice(4, 6), 16);
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.5;
 }

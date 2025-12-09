@@ -182,9 +182,15 @@ export function useGameTimer({
   ]);
 
   const handleTap = useCallback(() => {
+    "worklet";
     const currentState = timerState.value;
     if (currentState === "idle") {
-      start();
+      // Start timer
+      remainingTime.value = totalDuration.value;
+      progress.value = 1;
+      lastTickSecond.value = -1;
+      timerState.value = "running";
+      frameCallback.setActive(true);
     } else if (currentState === "expired") {
       // When expired, just reset and switch player without auto-starting
       timerState.value = "idle";
@@ -196,15 +202,22 @@ export function useGameTimer({
         scheduleOnRN(onPlayerSwitch);
       }
     } else if (currentState === "running") {
-      stop();
+      // Stop timer
+      timerState.value = "idle";
+      frameCallback.setActive(false);
+      remainingTime.value = totalDuration.value;
+      progress.value = 1;
+      lastTickSecond.value = -1;
+      if (onPlayerSwitch) {
+        scheduleOnRN(onPlayerSwitch);
+      }
     } else if (currentState === "paused") {
-      resume();
+      // Resume timer
+      timerState.value = "running";
+      frameCallback.setActive(true);
     }
   }, [
     timerState,
-    start,
-    stop,
-    resume,
     frameCallback,
     remainingTime,
     totalDuration,

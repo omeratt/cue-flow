@@ -11,7 +11,7 @@
  */
 
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   createAnimatedComponent,
@@ -67,7 +67,10 @@ export function CircularTimer({
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  let timer;
+
+  // Ref to store timeout for haptic feedback
+  const hapticTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Press handlers for animation
   const handlePressIn = useCallback(() => {
     if (hapticEnabled) {
@@ -82,12 +85,14 @@ export function CircularTimer({
 
   const handlePressOut = useCallback(() => {
     if (hapticEnabled) {
-      clearTimeout(timer);
+      // Clear any existing timer
+      if (hapticTimerRef.current) {
+        clearTimeout(hapticTimerRef.current);
+      }
 
-      setTimeout(async () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid).finally(() =>
-          clearTimeout(timer)
-        );
+      hapticTimerRef.current = setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+        hapticTimerRef.current = null;
       }, 90);
     }
 
@@ -95,7 +100,7 @@ export function CircularTimer({
       damping: 25,
       stiffness: 300,
     });
-  }, [hapticEnabled, scale, timer]);
+  }, [hapticEnabled, scale]);
 
   const handlePress = useCallback(() => {
     onPress?.();
@@ -192,6 +197,22 @@ export function CircularTimer({
       ? theme.colors.textSecondary
       : theme.colors.textMuted;
 
+  // Generate accessibility label based on timer state
+  const getAccessibilityLabel = (): string => {
+    switch (currentTimerState) {
+      case "idle":
+        return "Timer. Tap to start";
+      case "running":
+        return `Timer running. ${displaySeconds} seconds remaining. Tap to stop`;
+      case "paused":
+        return `Timer paused. ${displaySeconds} seconds remaining`;
+      case "expired":
+        return "Time is up. Tap to reset and switch player";
+      default:
+        return "Timer";
+    }
+  };
+
   const timerContent = (
     <Animated.View
       style={[
@@ -246,6 +267,9 @@ export function CircularTimer({
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        accessibilityLabel={getAccessibilityLabel()}
+        accessibilityRole="button"
+        accessibilityHint="Controls the turn timer"
       >
         {timerContent}
       </Pressable>

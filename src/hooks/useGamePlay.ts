@@ -5,15 +5,17 @@
  *
  * Implements:
  * - GH-006: Hear audio alerts (via useTimerAudio)
+ * - GH-015: Pause and resume game (via useAppState)
  */
 
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { GAME_MODES } from "../lib/constants/game";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { pauseGame, resumeGame, switchPlayer } from "../store/slices/gameSlice";
+import { useAppState } from "./useAppState";
 import { useGameTimer } from "./useGameTimer";
 import { useTimerAudio } from "./useTimerAudio";
 
@@ -35,6 +37,9 @@ export function useGamePlay() {
   // Local state for current player name (synced from Redux)
   const [displayCurrentPlayer, setDisplayCurrentPlayer] =
     useState(currentPlayer);
+
+  // Track if timer was running before going to background (for auto-pause on background)
+  const wasRunningRef = useRef(false);
 
   const modeConfig = gameMode ? GAME_MODES[gameMode] : null;
 
@@ -77,6 +82,34 @@ export function useGamePlay() {
     onExpire: handleExpire,
     onPlayerSwitch: handlePlayerSwitch,
     onTick: handleTick,
+  });
+
+  // GH-015: Auto-pause timer when app goes to background
+  const handleAppBackground = useCallback(() => {
+    const currentState = timer.timerState.value;
+    if (currentState === "running") {
+      wasRunningRef.current = true;
+      timerAudio.stopTicking();
+      timer.pause();
+      dispatch(pauseGame());
+    } else {
+      wasRunningRef.current = false;
+    }
+  }, [timer, timerAudio, dispatch]);
+
+  // GH-015: When app returns to foreground, keep timer paused (user can resume manually)
+  // We don't auto-resume to avoid unexpected gameplay interruption
+  const handleAppForeground = useCallback(() => {
+    // Timer stays paused - user needs to manually resume
+    // This is intentional for better UX (player might need a moment to refocus)
+    wasRunningRef.current = false;
+  }, []);
+
+  // Set up app state listener
+  useAppState({
+    onBackground: handleAppBackground,
+    onForeground: handleAppForeground,
+    enabled: true,
   });
 
   // Sync current player from Redux to local state

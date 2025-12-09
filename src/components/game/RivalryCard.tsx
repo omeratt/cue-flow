@@ -1,8 +1,9 @@
 /**
  * RivalryCard - Displays a rivalry between two players
+ * Memoized for performance when rendering in lists
  */
 
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -22,7 +23,7 @@ interface RivalryCardProps {
   readonly onPress: (rivalry: Rivalry) => void;
 }
 
-export function RivalryCard({ rivalry, onPress }: RivalryCardProps) {
+function RivalryCardComponent({ rivalry, onPress }: RivalryCardProps) {
   const { theme } = useTheme();
   const pressed = useSharedValue(0);
 
@@ -112,6 +113,9 @@ export function RivalryCard({ rivalry, onPress }: RivalryCardProps) {
     </AnimatedTouchable>
   );
 }
+
+// Memoize to prevent unnecessary re-renders in lists
+export const RivalryCard = memo(RivalryCardComponent);
 
 const createStyles = (
   colors: ReturnType<typeof useTheme>["theme"]["colors"],
